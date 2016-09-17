@@ -38,11 +38,11 @@
     <td></td>
   </tr>
   <tr>
-    <td>rmpValues</td>
+    <td>rmpValues[]</td>
     <td></td>
   </tr>  
   <tr>
-    <td>torqueLevels</td>
+    <td>torqueLevels[]</td>
     <td></td>
   </tr>  
   
