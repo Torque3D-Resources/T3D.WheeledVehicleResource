@@ -18,7 +18,7 @@
 <p>The WheeledVehicleEngine is a datablock subclass with fields to define the parameters of a vehicle's drive train.</p>
 <table>
   <tr>
-  <thead colspan=2>WheeledVehicleEngine Console Fields</thead>
+  <thead colspan=2 style="text-align:center;">WheeledVehicleEngine Console Fields</thead>
   </tr>
   <tr>
     <td>minRPM</td>
@@ -32,22 +32,20 @@
     <td>ildeRPM</td>
     <td>RPM value at resting engine idle.</td>
   </tr>
+  
   <tr>
-    <td>minPitch</td>
+    <td>numTorqueLevels</td>
     <td></td>
   </tr>
   <tr>
-    <td>maxPitch</td>
+    <td>rmpValues</td>
     <td></td>
-  </tr> 
+  </tr>  
   <tr>
-    <td>minVolume</td>
+    <td>torqueLevels</td>
     <td></td>
-  </tr>
-  <tr>
-    <td>maxVolume</td>
-    <td></td>
-  </tr>
+  </tr>  
+  
   <tr>
     <td>numGears</td>
     <td></td>
@@ -96,6 +94,25 @@
     <td>overRevSlowdown</td>
     <td></td>
   </tr>
+  
+  <tr>
+    <td>minPitch</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>maxPitch</td>
+    <td></td>
+  </tr> 
+  <tr>
+    <td>minVolume</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>maxVolume</td>
+    <td></td>
+  </tr>
+
+  
   <tr>
     <td>fuelFlow</td>
     <td></td>
@@ -104,16 +121,5 @@
     <td>useAutomatic</td>
     <td></td>
   </tr>  
-  <tr>
-    <td>numTorqueLevels</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>rmpValues</td>
-    <td></td>
-  </tr>  
-  <tr>
-    <td>torqueLevels</td>
-    <td></td>
-  </tr>
+
 </table>
