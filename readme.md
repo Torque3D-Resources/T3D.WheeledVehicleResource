@@ -14,7 +14,7 @@
 <li>In-game vehicle datablock/settings editor gui</li>
 </ul>
 <hr width=75%>
-<h2>WheeledVehicleEnging</h2>
+<h2>WheeledVehicleEngine</h2>
 <p>The WheeledVehicleEngine is a datablock subclass with fields to define the parameters of a vehicle's drive train.</p>
 <table>
   <tr>
