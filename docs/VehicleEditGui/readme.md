@@ -5,4 +5,4 @@
 <img src=../media/vedit_engine.png>
 
 <h3>Steering/Suspension Fields</h3>
-<img src=../media/vedit_engine.png>
+<img src=../media/vedit_vehicle.png>
