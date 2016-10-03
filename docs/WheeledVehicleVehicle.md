@@ -2,6 +2,8 @@
 <p>A wheeled vehicle physics simulation is controlled by a number of datablocks representing aspects of the phyical object. These are: WheeledVehicleTire, WheeledVehicleSpring and WheeledVehicleData.
 
 <h2>WheeledVehicleTire</h2>
+<p>Tires act as springs and generate lateral and longitudinal forces to move the vehicle. These distortion/spring forces are what convert wheel angular velocity into forces that act on the rigid body</p>
+
 <table>
   <tr>
   <thead colspan=2 style="text-align:center;">WheeledVehicleEngine Console Fields</thead>
@@ -81,11 +83,38 @@
 
 <h2>WheeledVehicleSpring</h2>
 
+<table>
+  <tr>
+  <thead colspan=2 style="text-align:center;">WheeledVehicleEngine Console Fields</thead>
+  </tr>
+  <tr>
+    <td>length</td>
+    <td> Maximum spring length. ie. how far the wheel can extend from the root hub position.<br><br>
+    This should be set to the vertical (Z) distance the hub travels in the associated spring animation.
+    </td>
+  </tr>  
+  <tr>
+    <td>force</td>
+    <td>Maximum spring force (when compressed to minimum length, 0).<br><br>
+      Increasing this will make the vehicle suspension ride higher (for a given vehicle mass), and also make the vehicle more bouncy when landing jumps.
+    </td>
+  </tr>
+  <tr>
+    <td>damping</td>
+    <td>Force applied to slow changes to the extension of this spring.<br><br>
+      Increasing this makes the suspension stiffer which can help stabilise bouncy vehicles.
+    </td>
+  </tr>
+  <tr>
+    <td>antiSwayForce</td>
+    <td> Force applied to equalize extension of the spring on the opposite wheel.<br><br>
+      This force helps to keep the suspension balanced when opposite wheels are at different heights.
+    </td>
+  </tr>
+</table>
+
 <h2>WheeledVehicleData</h2>
 
-<p>Core datablock that defines a vehicle's drivetrain characteristics.</p>
-<h2>WheeledVehicleEngine</h2>
-<p>The WheeledVehicleEngine is a datablock subclass with fields to define the parameters of a vehicle's drive train.</p>
 <table>
   <tr>
   <thead colspan=2 style="text-align:center;">WheeledVehicleEngine Console Fields</thead>
@@ -102,95 +131,4 @@
     <td>ildeRPM</td>
     <td>RPM value at resting engine idle.</td>
   </tr>
-  
-  <tr>
-    <td>numTorqueLevels</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>rmpValues[]</td>
-    <td></td>
-  </tr>  
-  <tr>
-    <td>torqueLevels[]</td>
-    <td></td>
-  </tr>  
-  
-  <tr>
-    <td>numGears</td>
-    <td></td>
-  </tr>     
-  <tr>
-    <td>gearRatios[]</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>reverseRatio</td>
-    <td></td>
-  </tr>  
-  <tr>
-    <td>diffRatio</td>
-    <td></td>
-  </tr>     
-  <tr>
-    <td>shiftUpRPM</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>shiftDownRPM</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>transmissionSlip</td>
-    <td></td>
-  </tr>  
-  <tr>
-    <td>engineDrag</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>neutralBoost</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>slowDownRate</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>inertiaFactor</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>overRevSlowdown</td>
-    <td></td>
-  </tr>
-  
-  <tr>
-    <td>minPitch</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>maxPitch</td>
-    <td></td>
-  </tr> 
-  <tr>
-    <td>minVolume</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>maxVolume</td>
-    <td></td>
-  </tr>
-
-  
-  <tr>
-    <td>fuelFlow</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>useAutomatic</td>
-    <td></td>
-  </tr>  
-
 </table>
-
