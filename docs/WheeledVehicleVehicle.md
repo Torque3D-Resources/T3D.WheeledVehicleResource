@@ -1,12 +1,12 @@
 <h1>WheeledVehicle vehicle control datablocks</h1>
-<p>A wheeled vehicle physics simulation is controlled by a number of datablocks representing aspects of the phyical object. These are: WheeledVehicleTire, WheeledVehicleSpring and WheeledVehicleData.
+<p>The wheeled vehicle physics simulation is controlled by a number of datablocks representing aspects of the phyical object. These are: WheeledVehicleTire, WheeledVehicleSpring and WheeledVehicleData.
 
 <h2>WheeledVehicleTire</h2>
 <p>Tires act as springs and generate lateral and longitudinal forces to move the vehicle. These distortion/spring forces are what convert wheel angular velocity into forces that act on the rigid body</p>
 
-<table>
+<table valgin=top>
   <tr>
-  <thead colspan=2 style="text-align:center;">WheeledVehicleEngine Console Fields</thead>
+  <thead colspan=2 style="text-align:center;"><center><b>WheeledVehicleTire Console Fields</b></center></thead>
   </tr>
   <tr>
     <td>shapeFile</td>
@@ -82,10 +82,10 @@
 
 
 <h2>WheeledVehicleSpring</h2>
-
+<p>Springs act to generate verticle forces on the vehicle. These forces are converted to angular velocity and applied to the rigid body.</p>
 <table>
   <tr>
-  <thead colspan=2 style="text-align:center;">WheeledVehicleEngine Console Fields</thead>
+  <thead colspan=2 style="text-align:center;"><center><b>WheeledVehicleSpring Console Fields</b></center></thead>
   </tr>
   <tr>
     <td>length</td>
@@ -115,9 +115,9 @@
 
 <h2>WheeledVehicleData</h2>
 
-<table>
+<table valgin=top>
   <tr>
-  <thead colspan=2 style="text-align:center;">WheeledVehicleEngine Console Fields</thead>
+  <thead colspan=2 style="text-align:center;"><center><b>WheeledVehicleData Console Fields</b></center></thead>
   </tr>
   <tr>
     <td>minRPM</td>
