@@ -12,5 +12,5 @@
 </ul>
 <hr width=75%>
 
-<h3><a href="./WheeledVehicleEngine">WheeledVehicleEngine</a></h3>
-<h3><a href="./VehicleEditGui">VehicleEditGui</a></h3>
+<h3><a href="./WheeledVehicleEngine.md">WheeledVehicleEngine</a></h3>
+<h3><a href="./VehicleEditGui.md">VehicleEditGui</a></h3>
