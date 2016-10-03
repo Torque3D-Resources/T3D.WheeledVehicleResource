@@ -1,8 +1,5 @@
-<h1>Wheeled Vehicle Resource</h1>
-<p>A collection of upgrades for Wheeled Vehicle behavior ported from TGE to Torque 3D.</p>
-<p>This combines and extends several classic engine resources to provide several core improvements. A simulated drive train allows vehicles to be created with a wide range of performence characteristics. A number of GUI elements have been added or improved and script handling for multiple mounts is more fleshed out.</p>
-
-<img src="./media/screenshot_001.png">
+<h1>Wheeled Vehicle Resource Documentation</h1>
+<p>This resource encompasses several core objects and capabilities.</p>
 
 <ul>
 <li>RPM-based engine simulation</li>
