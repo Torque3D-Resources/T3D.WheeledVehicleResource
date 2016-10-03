@@ -14,3 +14,5 @@
 <li>In-game vehicle datablock/settings editor gui</li>
 </ul>
 <hr width=75%>
+<h3><a href="#">Download</a></h3>
+<h3><a href="./docs/readme.md">Docs</a></h3>
