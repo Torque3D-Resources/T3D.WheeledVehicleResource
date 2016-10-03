@@ -11,6 +11,6 @@
 <li>In-game vehicle datablock/settings editor gui</li>
 </ul>
 <hr width=75%>
-
-<h3><a href="./WheeledVehicleEngine.md">WheeledVehicleEngine</a></h3>
+<h3><a href="./WheeledVehicleEngine.md">WheeledVehicle Settings</a></h3>
+<h3><a href="./WheeledVehicleEngine.md">WheeledVehicleEngine Settings</a></h3>
 <h3><a href="./VehicleEditGui.md">VehicleEditGui</a></h3>
