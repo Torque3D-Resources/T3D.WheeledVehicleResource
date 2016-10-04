@@ -1,5 +1,5 @@
-<h1>WheeledVehicle vehicle control datablocks</h1>
-<p>The wheeled vehicle physics simulation is controlled by a number of datablocks representing aspects of the phyical object. These are: WheeledVehicleTire, WheeledVehicleSpring and WheeledVehicleData.
+<h1>WheeledVehicle suspension datablocks</h1>
+<p>The wheeled vehicle suspension simulation applies the forces generated through the vehicle drive train and accumulated through contact with game objects to the vehicle body. Lateral (steering) and longitudinal (acceleration/deceleration) forces are calculated based on the WheeledVehicleTire definition while verticle (Z-Axis) forces are calculated based on the settings defined in WheeledVehicleSpring.
 
 <h2>WheeledVehicleTire</h2>
 <p>Tires act as springs and generate lateral and longitudinal forces to move the vehicle. These distortion/spring forces are what convert wheel angular velocity into forces that act on the rigid body</p>
@@ -113,22 +113,3 @@
   </tr>
 </table>
 
-<h2>WheeledVehicleData</h2>
-
-<table valgin=top>
-  <tr>
-  <thead colspan=2 style="text-align:center;"><center><b>WheeledVehicleData Console Fields</b></center></thead>
-  </tr>
-  <tr>
-    <td>minRPM</td>
-    <td>Lower floor to clamp RPM value.</td>
-  </tr>  
-  <tr>
-    <td>maxRPM</td>
-    <td>Highest RPM in normal operating range.</td>
-  </tr>
-  <tr>
-    <td>ildeRPM</td>
-    <td>RPM value at resting engine idle.</td>
-  </tr>
-</table>
