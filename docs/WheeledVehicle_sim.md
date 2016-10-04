@@ -3,7 +3,7 @@
 The Wheeled vehicle is a complex object based on several modular datablocks which combine to form a simulated vehicle system. The core vehicle is defined with a WheeledVehicleData datablock which is derived from VehicleData, which itself is derived from ShapebaseData. 
 
 <h2>WheeledVehicleData</h2>
-<p>WheeledVehicleData defines the properties of the vehicle body along with audio and camera handling. It derives much capacity from the classes common to all vehicles: VehicleData/Vehicle. These classes are not instantiated directly and serve as parent to all mountable vehicles. The full list of console fields and commands associated with VehicleData can be found <a href=./Vehicle.md">here</a>.</p> We will focus on the subset of fields important to Torque script implementations of WheeledVehicleData that pertain to the physics/driving simulation.
+<p>WheeledVehicleData defines the properties of the vehicle body along with audio and camera handling. It derives much capacity from the classes common to all vehicles: VehicleData/Vehicle. These classes are not instantiated directly and serve as parent to all mountable vehicles. The full list of console fields and commands associated with VehicleData can be found <a href=./Vehicle.md>here</a>.</p> We will focus on the subset of fields important to Torque script implementations of WheeledVehicleData that pertain to the physics/driving simulation.
 
 
 <table valgin=top>
