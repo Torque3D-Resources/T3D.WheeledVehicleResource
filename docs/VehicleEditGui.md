@@ -9,7 +9,7 @@ The description for drivetrain fields can be found in the <a href=./WheeledVehic
 <h3>Steering/Suspension Fields</h3>
 <img src=./media/vedit_vehicle.png>
 
-The description for general Vehicle fields can be found in the <a href=./WheeledVehicleVehicle.md>WheeledVehicle vehicle documentation</a>.
+The description for general Vehicle fields can be found in the <a href=./WheeledVehicle_sim.md>WheeledVehicle vehicle documentation</a>.
 
 <h3>General Usage</h3>
 <p>The vehicle edit GUI can be invoked in-game with the Ctrl-V keyboard command. The screen will load with data pulled from the currently mounted vehicle's datablocks.</p>

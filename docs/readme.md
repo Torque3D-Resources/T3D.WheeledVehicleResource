@@ -7,8 +7,8 @@ With all of this in mind, to properly tune a vehicle it is necessary to see the 
 
 <p>This document is designed to focus primarily on fields and datablocks that control the physics simulation and their impact.</p>
 <hr width=75%>
+<h3><a href="./VehicleEditGui.md">VehicleEditGui</a></h3>
 <h3><a href="./WheeledVehicle_sim.md">WheeledVehicle Simulation Fields</a></h3>
 <h3><a href="./WheeledVehicleSuspension.md">WheeledVehicle Suspension Settings</a></h3>
 <h3><a href="./WheeledVehicleEngine.md">WheeledVehicleEngine Settings</a></h3>
-<h3><a href="./VehicleEditGui.md">VehicleEditGui</a></h3>
-<h3><a href="./WheeledVehicle_art.md">VehicleEditGui</a></h3>
+<h3><a href="./WheeledVehicle_art.md">Particles and Audio</a></h3>
