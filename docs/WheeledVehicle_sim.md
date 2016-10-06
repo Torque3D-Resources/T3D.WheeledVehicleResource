@@ -113,21 +113,23 @@ onLeaveLiquid() - Vehicle
 onShift()
 
 <h3>Wheeled Vehicle Console Functions</h3>
-setWheelSteering(S32 wheel, F32 steering);
-setWheelPowered(S32 wheel,bool powered)
-setWheelTire(S32 wheel, WheeledVehicleTire * tire)
-getTire(S32 wheel)
-setWheelSpring(S32 wheel, WheeledVehicleSpring * tire)
-getSpring(S32 wheel)
-getWheelCount();
-setEngine(WheeledVehicleEngine * engine);
-getEngine();
-setGear();
-upShift();
-downShift();
-getGear();
-getSpeed();
-getRPM();
-setAuto(bool isAuto);
-isDefaultAuto();
-isAuto();
+<ul>
+<li>setWheelSteering(S32 wheel, F32 steering)</li>
+<li>setWheelPowered(S32 wheel,bool powered)</li>
+<li>setWheelTire(S32 wheel, WheeledVehicleTire * tire)</li>
+<li>getTire(S32 wheel)</li>
+<li>setWheelSpring(S32 wheel, WheeledVehicleSpring * tire)</li>
+<li>getSpring(S32 wheel)</li>
+<li>getWheelCount()</li>
+<li>setEngine(WheeledVehicleEngine * engine)</li>
+<li>getEngine()</li>
+<li>setGear()</li>
+<li>upShift()</li>
+<li>downShift()</li>
+<li>getGear()</li>
+<li>getSpeed()</li>
+<li>getRPM()</li>
+<li>setAuto(bool isAuto)</li>
+<li>isDefaultAuto()</li>
+<li>isAuto()</li>
+</ul>

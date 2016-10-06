@@ -1378,20 +1378,23 @@ void WheeledVehicle::updateMove(const Move* move)
 
 /***KGB: ***/
    // Steering return-to-center based on original resource by James Jacoby
-   if (mCenterSteeringRate >0.0f)
-   {
-      F32 returnSpeed = mFabs( move->y * mCenterSteeringRate ); // based on forward/backward motion
-      if( mSteering.x > 0.0f )
-      {
-         mSteering.x -= returnSpeed;
-         mSteering.x < 0.0f ? 0.0f : mSteering.x;  // KGB: make sure we don't go past zero
-      }else if( mSteering.x < 0.0f )
-      {
-         mSteering.x += returnSpeed;
-         mSteering.x > 0.0f ? 0.0f : mSteering.x;  // KGB: make sure we don't go past zero
-      }
-   }
+   //if (mCenterSteeringRate >0.0f)
+   //{
+   //   F32 returnSpeed = mFabs( move->y * mCenterSteeringRate ); // based on forward/backward motion
+   //   if( mSteering.x > 0.0f )
+   //   {
+   //      mSteering.x -= returnSpeed;
+   //      mSteering.x < 0.0f ? 0.0f : mSteering.x;  // KGB: make sure we don't go past zero
+   //   }else if( mSteering.x < 0.0f )
+   //   {
+   //      mSteering.x += returnSpeed;
+   //      mSteering.x > 0.0f ? 0.0f : mSteering.x;  // KGB: make sure we don't go past zero
+   //   }
+   //}
 /* KGB End */
+
+
+
 }
 
 
@@ -1579,7 +1582,8 @@ void WheeledVehicle::updateForces(F32 dt)
 
          // Spring forces act straight up and are applied at the
          // spring's root position.
-         Point3F t, forceVector = bz * (spring + damping + antiSway);
+         //Point3F t, forceVector = bz * (spring + damping + antiSway);
+         Point3F t, forceVector = wheel->data->pos * (spring + damping + antiSway);  // KGB: The animated hub at position 0 ends up being a closer approximation to the spring root than the vehicle mass center.
          mCross(r, forceVector, &t);
          mRigid.torque += t;
          mRigid.force += forceVector;

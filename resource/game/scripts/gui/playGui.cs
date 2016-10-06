@@ -100,7 +100,8 @@ function PlayGui::updateGear(%this, %gear)
       gearIndicator.basePos = gearIndicator.position;
    }
    //gearIndicator.basePos = gearIndicator.getBasePosition();
-	warn("Basepos:" @ gearIndicator.basePos);
+	//warn("Basepos:" @ gearIndicator.basePos);
+	
    // Positive goes left to right
    %px = getWord(gearIndicator.basePos,0);
    %dx = %px + (%gear * gearIndicator.shiftX);
@@ -115,7 +116,7 @@ function PlayGui::updateGear(%this, %gear)
    //%gp = "767 "@%p;
 
    %gp = %dx SPC %dy;
-   error("DriveGui::updateGear:" @ %gear SPC " x/y:" @ %gp);
+   //error("DriveGui::updateGear:" @ %gear SPC " x/y:" @ %gp);
    //gearIndicator.position = %gp;
 	 gearIndicator.setPosition(%dx,%dy);
 }
@@ -143,14 +144,14 @@ function clientCmdUpdateGearDisplay(%gear)
 {
 	//updtGearDisp(%gear);
 	PlayGui.updateGear(%gear);
-	echo("***:" @%gear);
+//	echo("***:" @%gear);
 	//showPlayDialog();
 }
 
 function updtGearDisp(%gear)
 {
 	PlayGui.updateGear(%gear);
-	echo("updategear:" @%gear);
+//	echo("updategear:" @%gear);
 }
 
 //-----------------------------------------------------------------------------

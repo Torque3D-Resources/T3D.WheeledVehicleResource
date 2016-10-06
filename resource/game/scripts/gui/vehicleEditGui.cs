@@ -44,21 +44,74 @@ function vehicleEditGui::saveToFile(%this){
 		%oname.delete();
 	}
 	%grp = new SimGroup(%oname){};
-	%vehicle = new WheeledVehicleData(%base){
-	   category = "Vehicles";
-   		shapeFile = "art/shapes/Jeep/Body/jeep.DAE";
-	};
-	%engine = new WheeledVehicleEngine(%base @ "Engine");
-	%tire = new WheeledVehicleTire(%base @ "Tire");
-	%spring = new WheeledVehicleSpring(%base @ "Spring");
-	echo("Created");
+
+	%vehicle = %this.curVehicle.clone();
+	%vehicle.name = %base @ "Car";
+	%engine = %this.curEngine.clone();
+	%engine.name = %base @ "Engine";
+	%tire = %this.curTire.clone();
+	%tire.name = %base @ "Tire";
+	%spring = %this.curSpring.clone();
+	%spring.name = %base @ "Spring";	
+			
+	echo("Vehicle Datablocks Created for"@%base@".");
+   if(isObject(%vehicle.damageEmitter[0])){
+      if(isObject(%vehicle.damageEmitter[0].particles))
+         %grp.add(%vehicle.damageEmitter[0].particles);
+      %grp.add(%vehicle.tireEmitter);      
+   }else{
+      %vehicle.damageEmitter[0]="";
+   }
+   if(isObject(%vehicle.damageEmitter[1])){
+      if(isObject(%vehicle.damageEmitter[1].particles))
+         %grp.add(%vehicle.damageEmitter[1].particles);
+      %grp.add(%vehicle.tireEmitter);      
+   }else{
+      %vehicle.damageEmitter[1]="";
+   }
+   if(isObject(%vehicle.damageEmitter[2])){
+      if(isObject(%vehicle.damageEmitter[2].particles))
+         %grp.add(%vehicle.damageEmitter[2].particles);
+      %grp.add(%vehicle.tireEmitter);      
+   }else{
+      %vehicle.damageEmitter[2]="";
+   }
+   if(isObject(%vehicle.splashEmitter)){
+      if(isObject(%vehicle.splashEmitter.particles))
+         %grp.add(%vehicle.splashEmitter.particles);
+      %grp.add(%vehicle.splashEmitter);
+   } else {
+      %vehicle.splashEmitter="";
+   }
+         
+   if(isObject(%vehicle.tireEmitter)){
+      if(isObject(%vehicle.tireEmitter.particles))
+         %grp.add(%vehicle.tireEmitter.particles);
+      %grp.add(%vehicle.tireEmitter);
+   }else {
+      %vehicle.tireEmitter="";
+   }
+   
+   if(isObject(%vehicle.engineSound))
+      %grp.add(%vehicle.engineSound);
+   
+   if(isObject(%vehicle.squealSound))
+      %grp.add(%vehicle.squealSound);
+            
+   if(isObject(%vehicle.softImpactSound))
+      %grp.add(%vehicle.softImpactSound);
+      
+   if(isObject(%vehicle.hardImpactSound))
+      %grp.add(%vehicle.hardImpactSound);
+
 	%grp.add(%engine);
 	%grp.add(%tire);
 	%grp.add(%spring);
 	%grp.add(%vehicle);
+	
 	saveEngineGuiData(%vehicle, %engine, %tire, %spring);
-	echo("Saving");
 	%fn = "./"@%base@".cs";
+	warn("Saving:"@%fn);
 	%grp.save(%fn);
 }
 
@@ -111,17 +164,25 @@ function loadEngineGui(%vehicle, %engine, %tire, %spring)
 	
 	//C_MaxWheel.setText(%vehicle.maxWheelSpeed);
 	C_DustVolume.setText(%vehicle.DustVolume);
-	C_SteerBoostSpeed.setText(%vehicle.steeringBoostVelocity);
-	C_SteerBoostAngle.setText(%vehicle.steeringBoost);
 	C_BrakeTorque.setText(%vehicle.brakeTorque);
 	C_MaxSteer.setText(%vehicle.maxSteeringAngle);
 	C_Mass.setText(%vehicle.mass);
 	C_MassCenter.setText(%vehicle.massCenter);
-	//C_Drag.setText(%vehicle.drag);
+	C_Drag.setText(%vehicle.drag);
 	C_BodyFriction.setText(%vehicle.bodyFriction);
 	C_BodyRestitution.setText(%vehicle.bodyRestitution);
-   error("Steer:"@%vehicle.centerSteeringRate);
-   C_CenterSteeringRate.setText(%vehicle.centerSteeringRate);
+   C_MassBox.setText(%vehicle.massBox);
+   
+   
+   
+   C_SteeringReturn.setText(%vehicle.steeringReturn);
+	C_SteeringReturnSpeedScale.setText(%vehicle.steeringReturnSpeedScale);
+	C_PowerSteering.setText(%vehicle.powerSteering);
+
+//	C_SteerBoostSpeed.setText(%vehicle.steeringBoostVelocity);
+//	C_SteerBoostAngle.setText(%vehicle.steeringBoost);
+
+
 	
 	S_len.setText(%spring.length);
 	S_force.setText(%spring.force);
@@ -142,7 +203,7 @@ function loadEngineGui(%vehicle, %engine, %tire, %spring)
 
 function saveEngineGuiData(%vehicle, %engine, %tire, %spring)
 {	
-	%engine.throttleIdle = E_Idle.getText();
+	//%engine.throttleIdle = E_Idle.getText();
 	%engine.minRPM = E_MinRpm.getText();
 	%engine.maxRPM = E_MaxRpm.getText();
 	%engine.idleRPM = E_IdleRPM.getText();
@@ -173,19 +234,25 @@ function saveEngineGuiData(%vehicle, %engine, %tire, %spring)
 		eval("%engine.RPMValues["@%i@"] = E_TL_RPM"@%i@".getText();");
 		eval("%engine.TorqueLevels["@%i@"] = E_TL_Torque"@%i@".getText();");
 	}
-	
-	
+
 	%vehicle.DustVolume = C_DustVolume.getText();
-	%vehicle.steeringBoostVelocity = C_SteerBoostSpeed.getText();
-	%vehicle.steeringBoost = C_SteerBoostAngle.getText();
 	%vehicle.brakeTorque = C_BrakeTorque.getText();
 	%vehicle.maxSteeringAngle = C_MaxSteer.getText();
 	%vehicle.mass = C_Mass.getText();
 	%vehicle.massCenter = C_MassCenter.getText();
 	%vehicle.bodyFriction = C_BodyFriction.getText();
-	%vehicle.bodyRestitution = C_BodyRestitution.getText();	
+	%vehicle.bodyRestitution = C_BodyRestitution.getText();
    %vehicle.centerSteeringRate = C_CenterSteeringRate.getText();
+   %vehicle.drag = C_Drag.getText();
+   %vehicle.massBox = C_MassBox.getText();
    
+   %vehicle.steeringReturn = C_SteeringReturn.getText();
+	%vehicle.steeringReturnSpeedScale = C_SteeringReturnSpeedScale.getText();
+	%vehicle.powerSteering = C_PowerSteering.getText();
+
+	//%vehicle.steeringBoostVelocity = C_SteerBoostSpeed.getText();
+	//%vehicle.steeringBoost = C_SteerBoostAngle.getText();
+
    
 	%spring.length = S_len.getText();
 	%spring.force = S_force.getText();
@@ -252,16 +319,24 @@ function vehicleEditGui::clearFields(%this){
 	
 	//C_MaxWheel.setText(%vehicle.maxWheelSpeed);
 	C_DustVolume.setText("");
-	C_SteerBoostSpeed.setText("");
-	C_SteerBoostAngle.setText("");
+	//C_SteerBoostSpeed.setText("");
+	//C_SteerBoostAngle.setText("");
 	C_BrakeTorque.setText("");
 	C_MaxSteer.setText("");
 	C_Mass.setText("");
 	C_MassCenter.setText("");
-	//C_Drag.setText(%vehicle.drag);
+   C_MassBox.setText("");
+	C_Drag.setText("");
 	C_BodyFriction.setText("");
 	C_BodyRestitution.setText("");
    C_CenterSteeringRate.setText("");
+
+   C_SteeringReturn.setText("");
+	C_SteeringReturnSpeedScale.setText("");
+	C_PowerSteering.setText("");
+
+
+
 	
 	S_len.setText("");
 	S_force.setText("");
