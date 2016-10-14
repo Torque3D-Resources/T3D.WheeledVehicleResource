@@ -57,10 +57,31 @@ function WheeledVehicleData::onAdd(%this, %obj)
 		
 }
 
+function WheeledVehicleData::onBrake(%this, %obj, %type){
+   echo("Brakes Pressed("@%obj SPC %obj.name@"):"@ %type);
+   %obj.onBrake(%type);    // Just pass it through to the vehicle for now.
+}
+
+function WheeledVehicle::onBrake(%this, %type){
+   // Override in subclasses to handle shape-specific animations/lighting, etc.   
+}
+
+
+// Something has hit us
 function WheeledVehicleData::onCollision(%this, %obj, %col, %vec, %speed)
 {
    // Collision with other objects, including items
+   warn("Collision:"@%obj@" was hit by "@%col@" @ "@%speed@" from "@%vec);
 }
+
+// We have hit something
+function WheeledVehicleData::onImpact(%this, %obj, %col, %vec, %speed)
+{
+   // Collision with other objects, including items
+   warn("Impact:"@%obj@" hit something going "@ %speed);
+}
+
+
 
 function WheeledVehicleEngine::onShift(%this, %obj, %gear, %rpm){
 	echo("(engine)Shifted to:" @ %gear SPC "RPM:" @ %rpm);
@@ -190,3 +211,13 @@ function serverCmdCarHop(%client)
    //}
 }
 
+
+function serverCmdtoggleHeadLights(%client)
+{
+   %car = %client.player.getControlObject();
+   if (%car.getClassName() $= "WheeledVehicle")
+   {   
+      %datablosk = %car.getDatablock();
+      %datablosk.toggleHeadlights(%car);
+   }
+}

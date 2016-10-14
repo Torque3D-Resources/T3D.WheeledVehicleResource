@@ -66,6 +66,7 @@ struct WheeledVehicleTire: public SimDataBlock
    // Shape information initialized in the preload
    Resource<TSShape> shape;   // The loaded shape
    F32 radius;                // Tire radius
+   F32 circumference;         // Tire circumference
 
    //
    WheeledVehicleTire();
@@ -190,7 +191,13 @@ struct WheeledVehicleData: public VehicleData
    F32 maxWheelSpeed;            // Engine torque is scale based on wheel speed
    F32 engineTorque;             // Engine force controlled through throttle
    F32 engineBrake;              // Break force applied when throttle is 0
-   F32 brakeTorque;              // Force used when brakeing
+   F32 brakeTorque;              // Maximum brake force
+
+   F32 brakeRate;                // Torque per second increase of braking force
+   F32 brakeIncrease;            // Scale to increase base brake rate when brakes are applied (brakeRate *dt) + (brakeRate * brakeIncrease *dt);
+
+   F32 freefallGravity;          // Multiplier for gravity acceleration in free-fall
+   S32 freefallContact;          // Multiplier for gravity acceleration in free-fall
 
    // Initialized onAdd
    struct Wheel 
@@ -214,6 +221,8 @@ struct WheeledVehicleData: public VehicleData
    bool mirrorWheel(Wheel* we);
    virtual void packData(BitStream* stream);
    virtual void unpackData(BitStream* stream);
+
+   DECLARE_CALLBACK( void, onBrake, ( GameBase* obj, S32 brake, S32 type, F32 brakeLevel ) );
 };
 
 
@@ -266,6 +275,9 @@ class WheeledVehicle: public Vehicle
       bool slipping;          // Traction on last tick
       F32 torqueScale;        // Max torque % applied to wheel (0-1)
       F32 slip;               // Amount of wheel slip (0-1)
+      F32 rpm;
+      F32 rot;
+      
       SimObjectPtr<ParticleEmitter> emitter;
    };
    Wheel mWheel[WheeledVehicleData::MaxWheels];
@@ -302,6 +314,7 @@ class WheeledVehicle: public Vehicle
 	S32 mGearDelay;		// Counter for Pause after shift (may be obsolete)
 	S32 mStuckCounter;	// Counter for impact
 	bool mContPowered;
+   F32 mGravityAccum;    // Accumulate time in free-fall.
 /*** KGB End */
 
 public:
@@ -338,7 +351,6 @@ public:
 	F32 mEngineRPM;		// Current engine RPM - used for real-time calculations
 	F32 mWheelRPM;		// Current wheel RPM - used for real-time calculations
 
-
 	WheeledVehicleTire * getTire(S32 wheel);
 	WheeledVehicleSpring * getSpring(S32 wheel);
 	
@@ -358,8 +370,14 @@ public:
 	void setAutomatic(bool isAuto);	// Sets the LOCAL transmission automatic setting
 
 	S8 mBrakeTrigger;	// Movemanager trigger that brakes should respond to.
+   F32 mBrakeLevel;  // Current level of brake application;
 
 
+   F32 distPerSec(F32 rpm, F32 circumference) { return (rpm * circumference) * 0.0166666666666667; }
+   F32 rpmFromVel(F32 vel, F32 circumference);
+   F32 applyTransmissionRatios(F32 engineRPM);
+   F32 gearRatio();
+   F32 gearRatio(S32 gear);
 //*** KGB End */
 
 };

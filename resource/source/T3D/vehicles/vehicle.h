@@ -303,6 +303,9 @@ public:
    virtual void mountObject( SceneObject *obj, S32 node, const MatrixF &xfm = MatrixF::Identity );
    /// @}
 
+
+   virtual void onCollision( SceneObject *object, const VectorF &vec );
+   VectorF mCollisionImpulse;  // Impulse to roll in from external collisions.
    DECLARE_CONOBJECT(Vehicle);
 };
 

@@ -27,7 +27,7 @@ function CheetahCar::onAdd(%this, %obj)
 	// ** Add vehicle-specific engine here
 	%obj.setEngine( DefaultEngine );   
     %obj.fuelFlow = .1;
-    %obj.hop = 3000;   
+    %obj.hop = 3000;
 
    %obj.setWheelTire(0,CheetahCarTire);
    %obj.setWheelTire(1,CheetahCarTire);
@@ -129,22 +129,17 @@ function CheetahCar::onRemove(%this, %obj)
       %obj.turret.delete();
 }
 
-function serverCmdtoggleBrakeLights(%client)
+function CheetahCar::onBrake(%this, %car, %type)
 {
-   %car = %client.player.getControlObject();
-
-   if (%car.getClassName() $= "WheeledVehicle")
+   if(%type == 0)
    {
-      if(%car.rightBrakeLight.isEnabled)
-      {
-         %car.rightBrakeLight.setLightEnabled(0);
-         %car.leftBrakeLight.setLightEnabled(0);
-      }
-      else
-      {
-         %car.rightBrakeLight.setLightEnabled(1);
-         %car.leftBrakeLight.setLightEnabled(1);
-      }
+      %car.rightBrakeLight.setLightEnabled(0);
+      %car.leftBrakeLight.setLightEnabled(0);
+   }
+   else
+   {
+      %car.rightBrakeLight.setLightEnabled(1);
+      %car.leftBrakeLight.setLightEnabled(1);
    }
 }
 

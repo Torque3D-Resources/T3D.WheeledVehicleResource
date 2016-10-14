@@ -1,11 +1,11 @@
-datablock SFXProfile(hardImpact)
+datablock SFXProfile(hardImpactSound)
 {
    preload = "1";
    description = "AudioDefault3D";
    fileName = "art/sound/cheetah/hardImpact.ogg";
 };
 
-datablock SFXProfile(softImpact)
+datablock SFXProfile(softImpactSound)
 {
    preload = "1";
    description = "AudioDefault3D";
@@ -18,6 +18,16 @@ datablock SFXProfile(DirtKickup)
    description = "AudioDefault3D";
    fileName = "art/sound/cheetah/softImpact.ogg";
 };
+
+datablock SFXProfile(DefaultEngineSound)
+{
+   preload = "1";
+   description = "AudioDefault3D";
+   fileName = "art/sound/cheetah/cheetah_engine.ogg";
+};
+
+
+
 
 datablock ParticleData(DefaultTireParticle)
 {
@@ -40,6 +50,34 @@ datablock ParticleData(DefaultTireParticle)
    times[3]             = "1";
 };
 
+// Default Gray Smoke
+datablock ParticleData(GraySmokeParticle)
+{
+   textureName          = "art/particles/gray_smoke";
+   dragCoeffiecient     = 100.0;
+   gravityCoefficient   = 0;
+   inheritedVelFactor   = 0.25;
+   constantAcceleration = -0.30;
+   lifetimeMS           = 1000;
+   lifetimeVarianceMS   = 300;
+   useInvAlpha =  true;
+   spinRandomMin = -80.0;
+   spinRandomMax =  80.0;
+
+   colors[0]     = "0.16 0.16 0.16 1.0";
+   colors[1]     = "0.1 0.1 0.1 1.0";
+   colors[2]     = "0.0 0.0 0.0 0.0";
+
+   sizes[0]      = 1.0;
+   sizes[1]      = 2.0;
+   sizes[2]      = 1.0;
+
+   times[0]      = 0.0;
+   times[1]      = 0.5;
+   times[2]      = 1.0;
+};
+
+
 datablock ParticleEmitterData(DefaultTireEmitter)
 {
    ejectionPeriodMS = 20;
@@ -52,10 +90,107 @@ datablock ParticleEmitterData(DefaultTireEmitter)
    phiReferenceVel  = 0;
    phiVariance      = 360;
    overrideAdvance = false;
-   particles = "CheetahTireParticle";
+   particles = "DefaultTireParticle";
    blendStyle = "ADDITIVE";
 };
 
+
+datablock ParticleEmitterData(GraySmokeEmitter)
+{
+   ejectionPeriodMS = 10;
+   periodVarianceMS = 0;
+   ejectionVelocity = 4;
+   velocityVariance = 0.5;
+   thetaMin         = 0.0;
+   thetaMax         = 60.0;
+   //lifetimeMS       = 250;
+   particles = "GraySmokeParticle";
+   blendStyle = "ADDITIVE";
+   overrideAdvance = false;
+};
+
+// Default Black Smoke
+datablock ParticleData(BlackSmokeParticle)
+{
+   textureName          = "art/particles/black_smoke";
+   dragCoeffiecient     = 100.0;
+   gravityCoefficient   = 0;
+   inheritedVelFactor   = 0.25;
+   constantAcceleration = -0.30;
+   lifetimeMS           = 1200;
+   lifetimeVarianceMS   = 300;
+   useInvAlpha =  true;
+   spinRandomMin = -80.0;
+   spinRandomMax =  80.0;
+
+   colors[0]     = "0.56 0.36 0.26 1.0";
+   colors[1]     = "0.2 0.2 0.2 1.0";
+   colors[2]     = "0.0 0.0 0.0 0.0";
+
+   sizes[0]      = 4.0;
+   sizes[1]      = 2.5;
+   sizes[2]      = 1.0;
+
+   times[0]      = 0.0;
+   times[1]      = 0.5;
+   times[2]      = 1.0;
+};
+
+datablock ParticleEmitterData(BlackSmokeEmitter)
+{
+   ejectionPeriodMS = 10;
+   periodVarianceMS = 0;
+   ejectionVelocity = 4;
+   velocityVariance = 0.5;
+   thetaMin         = 0.0;
+   thetaMax         = 180.0;
+   //lifetimeMS       = 250;
+   particles = "GraySmokeParticle";
+   blendStyle = "ADDITIVE";
+   overrideAdvance = false;   
+};
+
+// Default bubble emitter.
+datablock ParticleData(DefaultVehicleBubbleParticle)
+{
+   textureName          = "art/particles/bubble";
+   dragCoeffiecient     = 0.0;
+   gravityCoefficient   = -0.25;
+   inheritedVelFactor   = 0.0;
+   constantAcceleration = 0.0;
+   lifetimeMS           = 1500;
+   lifetimeVarianceMS   = 600;
+   useInvAlpha          = false;
+   spinRandomMin        = -100.0;
+   spinRandomMax        =  100.0;
+
+   colors[0]     = "0.7 0.8 1.0 0.4";
+   colors[1]     = "0.7 0.8 1.0 0.4";
+   colors[2]     = "0.7 0.8 1.0 0.0";
+
+   sizes[0]      = 0.3;
+   sizes[1]      = 0.3;
+   sizes[2]      = 0.3;
+
+   times[0]      = 0.0;
+   times[1]      = 0.5;
+   times[2]      = 1.0;
+};
+
+datablock ParticleEmitterData(DefaultVehicleBubbleEmitter)
+{
+   ejectionPeriodMS = 9;
+   periodVarianceMS = 0;
+   ejectionVelocity = 1;
+   ejectionOffset   = 0.1;
+   velocityVariance = 0.5;
+   thetaMin         = 0.0;
+   thetaMax         = 80.0;
+   phiReferenceVel  = 0;
+   phiVariance      = 360;
+   overrideAdvances = false;
+   particles = "DefaultVehicleBubbleParticle";
+};
 
 datablock WheeledVehicleEngine(DefaultEngine) {
 	// Default Engine info...	

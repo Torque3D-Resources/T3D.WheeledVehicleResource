@@ -92,12 +92,13 @@
          horizSizing = "right";
          vertSizing = "bottom";
          profile = "GuiTabBorderProfile";
-         visible = "1";
+         visible = "0";
          active = "1";
          tooltipProfile = "GuiToolTipProfile";
          hovertime = "1000";
          isContainer = "1";
          internalName = "VeditEnginePane";
+         hidden = "1";
          canSave = "1";
          canSaveDynamicFields = "0";
 
@@ -2640,19 +2641,18 @@
          };
       };
       new GuiBitmapBorderCtrl(VeditVehiclePane) {
-         position = "28 84";
+         position = "27 84";
          extent = "806 411";
          minExtent = "8 2";
          horizSizing = "right";
          vertSizing = "bottom";
          profile = "GuiTabBorderProfile";
-         visible = "0";
+         visible = "1";
          active = "1";
          tooltipProfile = "GuiToolTipProfile";
          hovertime = "1000";
          isContainer = "1";
          internalName = "VeditVehiclePane";
-         hidden = "1";
          canSave = "1";
          canSaveDynamicFields = "0";
 
@@ -2748,7 +2748,7 @@
             canSave = "1";
             canSaveDynamicFields = "0";
          };
-         new GuiTextEditCtrl(C_SteerBoostAngle) {
+         new GuiTextEditCtrl(C_PowerSteering) {
             historySize = "0";
             tabComplete = "0";
             sinkAllKeyEvents = "0";
@@ -2761,7 +2761,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "121 155";
+            position = "119 195";
             extent = "31 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -2776,7 +2776,7 @@
             canSaveDynamicFields = "0";
          };
          new GuiTextCtrl() {
-            text = "Steering Boost Angle";
+            text = "Power Steering:";
             maxLength = "1024";
             margin = "0 0 0 0";
             padding = "0 0 0 0";
@@ -2784,8 +2784,8 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "12 154";
-            extent = "102 18";
+            position = "33 194";
+            extent = "78 18";
             minExtent = "8 2";
             horizSizing = "right";
             vertSizing = "bottom";
@@ -2798,7 +2798,7 @@
             canSave = "1";
             canSaveDynamicFields = "0";
          };
-         new GuiTextEditCtrl(C_SteerBoostSpeed) {
+         new GuiTextEditCtrl(C_SteeringReturnSpeedScale) {
             historySize = "0";
             tabComplete = "0";
             sinkAllKeyEvents = "0";
@@ -2811,7 +2811,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "121 131";
+            position = "119 171";
             extent = "31 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -2826,7 +2826,7 @@
             canSaveDynamicFields = "0";
          };
          new GuiTextCtrl() {
-            text = "Steering Boost Speed";
+            text = "Return Speed Scale:";
             maxLength = "1024";
             margin = "0 0 0 0";
             padding = "0 0 0 0";
@@ -2834,8 +2834,8 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "9 130";
-            extent = "105 18";
+            position = "14 170";
+            extent = "98 18";
             minExtent = "8 2";
             horizSizing = "right";
             vertSizing = "bottom";
@@ -2862,7 +2862,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "99 57";
+            position = "118 37";
             extent = "31 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -2885,7 +2885,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "19 57";
+            position = "38 37";
             extent = "78 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -2913,7 +2913,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "246 57";
+            position = "118 61";
             extent = "31 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -2936,7 +2936,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "180 58";
+            position = "52 62";
             extent = "63 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -2959,7 +2959,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "36 37";
+            position = "172 61";
             extent = "61 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -3033,7 +3033,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "17 84";
+            position = "17 121";
             extent = "94 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -3061,7 +3061,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "113 84";
+            position = "121 121";
             extent = "44 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -3441,7 +3441,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "236 83";
+            position = "260 131";
             extent = "41 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -3464,7 +3464,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "169 82";
+            position = "193 130";
             extent = "65 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -3765,7 +3765,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "176 123";
+            position = "200 155";
             extent = "61 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -3792,7 +3792,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "240 122";
+            position = "264 154";
             extent = "28 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -3820,7 +3820,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "100 37";
+            position = "236 61";
             extent = "59 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -3863,7 +3863,7 @@
             canSaveDynamicFields = "0";
          };
          new GuiTextCtrl() {
-            text = "Center Steering Rate:";
+            text = "Steering Return Rate:";
             maxLength = "1024";
             margin = "0 0 0 0";
             padding = "0 0 0 0";
@@ -3871,7 +3871,7 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "12 202";
+            position = "11 147";
             extent = "109 18";
             minExtent = "8 2";
             horizSizing = "right";
@@ -3885,7 +3885,7 @@
             canSave = "1";
             canSaveDynamicFields = "0";
          };
-         new GuiTextEditCtrl(C_CenterSteeringRate) {
+         new GuiTextEditCtrl(C_SteeringReturn) {
             historySize = "0";
             tabComplete = "0";
             sinkAllKeyEvents = "0";
@@ -3898,7 +3898,109 @@
             anchorBottom = "0";
             anchorLeft = "1";
             anchorRight = "0";
-            position = "129 203";
+            position = "119 146";
+            extent = "31 18";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "GuiTextEditProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+         };
+         new GuiTextCtrl() {
+            text = "Mass Box";
+            maxLength = "1024";
+            margin = "0 0 0 0";
+            padding = "0 0 0 0";
+            anchorTop = "1";
+            anchorBottom = "0";
+            anchorLeft = "1";
+            anchorRight = "0";
+            position = "181 85";
+            extent = "51 18";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "GuiTextProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+         };
+         new GuiTextEditCtrl(C_MassBox) {
+            historySize = "0";
+            tabComplete = "0";
+            sinkAllKeyEvents = "0";
+            password = "0";
+            passwordMask = "*";
+            text = "0 0 0";
+            maxLength = "1024";
+            margin = "0 0 0 0";
+            padding = "0 0 0 0";
+            anchorTop = "1";
+            anchorBottom = "0";
+            anchorLeft = "1";
+            anchorRight = "0";
+            position = "236 85";
+            extent = "59 18";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "GuiTextEditProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+         };
+         new GuiTextCtrl() {
+            text = "Drag";
+            maxLength = "1024";
+            margin = "0 0 0 0";
+            padding = "0 0 0 0";
+            anchorTop = "1";
+            anchorBottom = "0";
+            anchorLeft = "1";
+            anchorRight = "0";
+            position = "88 86";
+            extent = "24 18";
+            minExtent = "8 2";
+            horizSizing = "right";
+            vertSizing = "bottom";
+            profile = "GuiTextProfile";
+            visible = "1";
+            active = "1";
+            tooltipProfile = "GuiToolTipProfile";
+            hovertime = "1000";
+            isContainer = "1";
+            canSave = "1";
+            canSaveDynamicFields = "0";
+         };
+         new GuiTextEditCtrl(C_Drag) {
+            historySize = "0";
+            tabComplete = "0";
+            sinkAllKeyEvents = "0";
+            password = "0";
+            passwordMask = "*";
+            text = "0.6";
+            maxLength = "1024";
+            margin = "0 0 0 0";
+            padding = "0 0 0 0";
+            anchorTop = "1";
+            anchorBottom = "0";
+            anchorLeft = "1";
+            anchorRight = "0";
+            position = "118 85";
             extent = "31 18";
             minExtent = "8 2";
             horizSizing = "right";

@@ -316,8 +316,8 @@ datablock WheeledVehicleData(JeepCar)
    // Sounds
    engineSound = JeepEngineSound;
    squealSound = JeepSqueal;
-   softImpactSound = softImpact;
-   hardImpactSound = hardImpact;
+   softImpactSound = softImpactSound;
+   hardImpactSound = hardImpactSound;
 
    // Dynamic fields accessed via script
    nameTag = 'Jeep';
@@ -326,7 +326,7 @@ datablock WheeledVehicleData(JeepCar)
    mountPose0 = "sitting";
    tireEmitter = "DefaultTireEmitter";
    //dustEmitter = "CheetahTireEmitter";
-   dustHeight = ".5";
+   //dustHeight = ".5";
 
    // Mount slots
    turretSlot = 1;
@@ -338,21 +338,23 @@ datablock WheeledVehicleData(JeepCar)
    bulb2HeadSlot = 7;
    
    // damage from collisions
-collDamageMultiplier = 0.05;
-collDamageThresholdVel = 15;
+collDamageMultiplier = 0.01;
+collDamageThresholdVel = 10;
+numDamageLevels = 2;
 
 // damage levels
 damageLevelTolerance[0] = 0.5;
 damageEmitter[0] = GraySmokeEmitter;     // emitter used when damage is >= 50%
+//damageEmitter[0] = DefaultTireEmitter;     // emitter used when damage is >= 50%
 damageLevelTolerance[1] = 0.85;
 damageEmitter[1] = BlackSmokeEmitter;    // emitter used when damage is >= 85%
-damageEmitter[2] = DamageBubbleEmitter;  // emitter used instead of damageEmitter[0:1]
-                                         // when offset point is underwater
+damageEmitter[2] = DefaultVehicleBubbleEmitter;  // emitter used instead of damageEmitter[0:1]
+                                                 // when offset point is underwater
+
 // emit offsets (used for all active damage level emitters)
-damageEmitterOffset[0] = "0.5 3 1";
-damageEmitterOffset[1] = "-0.5 3 1";
-numDmgEmitterAreas = 2;
-   
+damageEmitterOffset[0] = "0 1.75 1";
+//damageEmitterOffset[1] = ".75 -1.75 1";
+numDmgEmitterAreas = 1;
 };
 
 datablock WheeledVehicleEngine(JeepEngine) {

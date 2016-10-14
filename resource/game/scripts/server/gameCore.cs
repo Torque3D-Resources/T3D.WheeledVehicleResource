@@ -344,6 +344,7 @@ function GameCore::onMissionLoaded(%game)
 
    //set up the game and game variables
    %game.initGameVars(%game);
+   echo("Adding Dynamic Objects");
    addDynamicObjects();
 
    $Game::Duration = %game.duration;

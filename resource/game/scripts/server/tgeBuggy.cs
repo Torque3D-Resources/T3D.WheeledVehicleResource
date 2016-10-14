@@ -15,6 +15,7 @@
 
 function TgeBuggyCar::onAdd(%this,%obj)
 {
+    Parent::onAdd(%this, %obj);
    // Setup the car with some defaults tires & springs
    for (%i = %obj.getWheelCount() - 1; %i >= 0; %i--) {
       %obj.setWheelTire(%i,BuggyCarTire);
@@ -33,5 +34,6 @@ function TgeBuggyCar::onAdd(%this,%obj)
    // Set engine and overrides
    %obj.setEngine( BuggyEngine );
    %obj.fuelFlow = .1;
+   %obj.hop = 3000;
 
 }

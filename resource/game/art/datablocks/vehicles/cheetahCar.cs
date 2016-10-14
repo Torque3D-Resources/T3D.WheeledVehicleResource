@@ -284,6 +284,7 @@ datablock WheeledVehicleData(CheetahCar)
 {
    category = "Vehicles";
    shapeFile = "art/shapes/Cheetah/Cheetah_Body.DAE";
+   debrisShapeName= "art/shapes/Cheetah/Cheetah_Body.DAE";
    emap = 1;
 
    mountPose[0] = sitting;
@@ -330,8 +331,8 @@ datablock WheeledVehicleData(CheetahCar)
    // Sounds
    engineSound = cheetahEngineSound;
    //squealSound = cheetahSqueal;
-   softImpactSound = softImpact;
-   hardImpactSound = hardImpact;
+   softImpactSound = softImpactSound;
+   hardImpactSound = hardImpactSound;
    
    // Particles
    tireEmitter = "CheetahTireEmitter";
@@ -346,6 +347,22 @@ datablock WheeledVehicleData(CheetahCar)
    turretSlot = 1;
    rightBrakeSlot = 2;
    leftBrakeSlot = 3;
+   
+   // damage from collisions
+   collDamageMultiplier = 0.05;
+   collDamageThresholdVel = 15;
+
+   // damage levels
+   damageLevelTolerance[0] = 0.5;
+   damageEmitter[0] = GraySmokeEmitter;     // emitter used when damage is >= 50%
+   damageLevelTolerance[1] = 0.85;
+   damageEmitter[1] = BlackSmokeEmitter;    // emitter used when damage is >= 85%
+   damageEmitter[2] = DefaultVehicleBubbleEmitter; // emitter used instead of damageEmitter[0:1]
+                                                   // when offset point is underwater   
+   // emit offsets (used for all active damage level emitters)
+   damageEmitterOffset[0] = "0.5 3 1";
+   damageEmitterOffset[1] = "-0.5 3 1";
+   numDmgEmitterAreas = 2;
 };
 
 datablock WheeledVehicleEngine(CheetahEngine) {

@@ -18,6 +18,10 @@ function vehicleEditGui::onAdd(%this){
 }
 
 function vehicleEditGui::onWake(%this){
+   if(%this.justCleared == true){
+      %this.justCleared = false;
+      return;
+   }
 	if(%this.curPane $= "")
 	   %this-->OptGraphicsButton.performClick();
 }
@@ -32,7 +36,7 @@ function vehicleEditGui::setPane(%this, %pane)
 }
 
 function vehicleEditGui::updateDatablocks(%this){
-	saveEngineGuiData(%this.curVehicle,	%this.curEngine, %this.curTire, %tire, %this.curSpring);	
+	saveEngineGuiData(%this.curVehicle,	%this.curEngine, %this.curTire, %this.curSpring);	
 	Canvas.popDialog(vehicleEditGui);
 }
 
@@ -72,7 +76,7 @@ function vehicleEditGui::saveToFile(%this){
    if(isObject(%vehicle.damageEmitter[2])){
       if(isObject(%vehicle.damageEmitter[2].particles))
          %grp.add(%vehicle.damageEmitter[2].particles);
-      %grp.add(%vehicle.tireEmitter);      
+      %grp.add(%vehicle.tireEmitter);
    }else{
       %vehicle.damageEmitter[2]="";
    }
@@ -83,7 +87,7 @@ function vehicleEditGui::saveToFile(%this){
    } else {
       %vehicle.splashEmitter="";
    }
-         
+
    if(isObject(%vehicle.tireEmitter)){
       if(isObject(%vehicle.tireEmitter.particles))
          %grp.add(%vehicle.tireEmitter.particles);
@@ -91,16 +95,16 @@ function vehicleEditGui::saveToFile(%this){
    }else {
       %vehicle.tireEmitter="";
    }
-   
+
    if(isObject(%vehicle.engineSound))
       %grp.add(%vehicle.engineSound);
-   
+
    if(isObject(%vehicle.squealSound))
       %grp.add(%vehicle.squealSound);
-            
+
    if(isObject(%vehicle.softImpactSound))
       %grp.add(%vehicle.softImpactSound);
-      
+
    if(isObject(%vehicle.hardImpactSound))
       %grp.add(%vehicle.hardImpactSound);
 
@@ -108,7 +112,7 @@ function vehicleEditGui::saveToFile(%this){
 	%grp.add(%tire);
 	%grp.add(%spring);
 	%grp.add(%vehicle);
-	
+
 	saveEngineGuiData(%vehicle, %engine, %tire, %spring);
 	%fn = "./"@%base@".cs";
 	warn("Saving:"@%fn);
@@ -183,11 +187,11 @@ function loadEngineGui(%vehicle, %engine, %tire, %spring)
 //	C_SteerBoostAngle.setText(%vehicle.steeringBoost);
 
 
-	
+	warn(%spring.name @ ": " @ %spring.length SPC %spring.force SPC %spring.antiswayForce SPC %spring.damping);
 	S_len.setText(%spring.length);
 	S_force.setText(%spring.force);
 	S_antiSway.setText(%spring.antiSwayForce);
-	S_Damping.setText(%spring.damping);
+	S_damping.setText(%spring.damping);
 	
 	W_LatForce.setText(%tire.lateralForce);
 	W_LatDamping.setText(%tire.lateralDamping);
@@ -253,12 +257,12 @@ function saveEngineGuiData(%vehicle, %engine, %tire, %spring)
 	//%vehicle.steeringBoostVelocity = C_SteerBoostSpeed.getText();
 	//%vehicle.steeringBoost = C_SteerBoostAngle.getText();
 
-   
+   echo(%spring.name @ ": " @ %spring.length SPC %spring.force SPC %spring.antiswayForce SPC %spring.damping);
 	%spring.length = S_len.getText();
 	%spring.force = S_force.getText();
 	%spring.antiSwayForce = S_antiSway.getText();
 	%spring.damping = S_Damping.getText();
-	
+	echo(%spring.name @ ": " @ %spring.length SPC %spring.force SPC %spring.antiswayForce SPC %spring.damping);
 	%tire.lateralForce = W_LatForce.getText();
 	%tire.lateralDamping = W_LatDamping.getText();
 	%tire.lateralRelaxation = W_LatRelax.getText();
@@ -334,9 +338,6 @@ function vehicleEditGui::clearFields(%this){
    C_SteeringReturn.setText("");
 	C_SteeringReturnSpeedScale.setText("");
 	C_PowerSteering.setText("");
-
-
-
 	
 	S_len.setText("");
 	S_force.setText("");
@@ -351,5 +352,6 @@ function vehicleEditGui::clearFields(%this){
 	W_LonRelax.setText("");
 	W_StaFriction.setText("");
 	W_KenFriction.setText("");
-
+	
+   %this.justCleared = true;
 }

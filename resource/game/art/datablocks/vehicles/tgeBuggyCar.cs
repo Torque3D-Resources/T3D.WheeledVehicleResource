@@ -137,44 +137,45 @@ datablock WheeledVehicleEngine(BuggyEngine) {
 	numTorqueLevels = 8;
 	
 	rpmValues[0] = 500.0;
-	torqueLevel[0] = 170.0;	
+	torqueLevels[0] = 170.0;	
 	rpmValues[1] = 1000.0;
-	torqueLevel[1] = 175.0;	
+	torqueLevels[1] = 175.0;	
 	rpmValues[2] = 1500.0;
-	torqueLevel[2] = 80.0;	
+	torqueLevels[2] = 80.0;	
 	rpmValues[3] = 2000.0;
-	torqueLevel[3] = 85.0;
+	torqueLevels[3] = 85.0;
 	rpmValues[4] = 2500.0;
-	torqueLevel[4] = 90.0;	
+	torqueLevels[4] = 90.0;	
 	rpmValues[5] = 3000.0;
-	torqueLevel[5] = 100.0;	
+	torqueLevels[5] = 100.0;	
 	rpmValues[6] = 3500.0;
-	torqueLevel[6] = 95.0;
+	torqueLevels[6] = 95.0;
 	rpmValues[7] = 4000.0;
-	torqueLevel[7] = 110.0;	
+	torqueLevels[7] = 110.0;	
 	rpmValues[8] = 4500.0;
-	torqueLevel[8] = 200.0;
+	torqueLevels[8] = 200.0;
 };
 
 datablock WheeledVehicleData(TgeBuggyCar)
 {
    category = "Vehicles";
    shapeFile = "art/shapes/tgeBuggy/buggy.dts";
+   debrisShapeName= "art/shapes/tgeBuggy/buggy.dts";
    emap = true;
 
    maxDamage = 1.0;
-   destroyedLevel = 0.5;
-
+   disabledLevel = 0.75;
+   destroyedLevel = 1;
+   blowupWhenDestroyed = 1;
+   
    maxSteeringAngle = 0.385;  // Maximum steering angle, should match animation
-   steeringBoostVelocity = 12;
-   steeringBoost = .3;
-   tireEmitter = TireEmitter; // All the tires use the same dust emitter
+   tireEmitter = DefaultTireEmitter; // All the tires use the same dust emitter
 
    // 3rd person camera setting
    useEyePoint = true;		  // Use the vehile eye (uses player eye if false)
    cameraRoll = false;         // Roll the camera with the vehicle
-   cameraMaxDist = 10.8;         // Far distance from vehicle
-   cameraOffset = 6.5;        // Vertical offset from camera mount point
+   cameraMaxDist = 4;         // Far distance from vehicle
+   cameraOffset = .8;        // Vertical offset from camera mount point
    cameraLag = 0.26;           // Velocity lag of camera
    cameraDecay = 1.25;        // Decay per sec. rate of velocity lag
 
@@ -195,7 +196,24 @@ datablock WheeledVehicleData(TgeBuggyCar)
    contactTol = 0.1;          // Contact velocity tolerance
 
 
-   // Engine
+   // damage from collisions
+   collDamageMultiplier = 0.05;
+   collDamageThresholdVel = 15;
+
+   // damage levels
+   damageLevelTolerance[0] = 0.5;
+   damageEmitter[0] = GraySmokeEmitter;     // emitter used when damage is >= 50%
+   damageLevelTolerance[1] = 0.85;
+   damageEmitter[1] = BlackSmokeEmitter;    // emitter used when damage is >= 85%
+   damageEmitter[2] = DefaultVehicleBubbleEmitter; // emitter used instead of damageEmitter[0:1]
+                                                   // when offset point is underwater   
+   // emit offsets (used for all active damage level emitters)
+   damageEmitterOffset[0] = "0.5 3 1";
+   damageEmitterOffset[1] = "-0.5 3 1";
+   numDmgEmitterAreas = 2;
+
+
+   // T3d Internal Engine
    engineTorque = 4300;       // Engine power
    engineBrake = "5000";         // Braking when throttle is 0
    maxWheelSpeed = 50;        // Engine scale by current speed / max speed   
@@ -203,22 +221,18 @@ datablock WheeledVehicleData(TgeBuggyCar)
    // Brakes
    brakeTorque = "10000";        // When brakes are applied
 
-
-
-
    // Energy
    maxEnergy = 100;
    jetForce = 3000;
    minJetEnergy = 30;
    jetEnergyDrain = 2;
-
    // Sounds
 //   jetSound = ScoutThrustSound;
-   engineSound = BuggyEngineSound;
+   engineSound = DefaultEngineSound;
 //   squealSound = ScoutSquealSound;
-//   softImpactSound = SoftImpactSound;
-//   hardImpactSound = HardImpactSound;
-//   wheelImpactSound = WheelImpactSound;
+   softImpactSound = SoftImpactSound;
+   hardImpactSound = HardImpactSound;
+   wheelImpactSound = softImpactSound;
 
 //   explosion = VehicleExplosion;
 
@@ -226,6 +240,7 @@ datablock WheeledVehicleData(TgeBuggyCar)
    mountDelay = 2;
    dismountDelay = 1;
 
+   nameTag = 'Buggy';   
    stationaryThreshold = 0.5;
    maxDismountSpeed = 0.1;
    numMountPoints = 2;

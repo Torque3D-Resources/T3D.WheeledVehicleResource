@@ -34,6 +34,53 @@
 // In theory this would work for HoverVehicles and FlyingVehicles also, but
 // hasn't been tested or fully implemented for those classes -- yet.
 
+function Vehicle::onRemove(%this, %obj, %lastState){
+   echo("Vehicle OnRemove");
+}
+function VehicleData::onRemove(%this, %obj, %lastState){
+   echo("Vehicle OnRemove");
+}
+
+
+function VehicleData::onDestroyed(%this, %obj, %lastState)
+{
+   error("Object Destroyed:"@%obj@" Last State:"@%lastState);
+   //%obj.blowup();
+   //%obj.schedule(100, "removeSelf");
+
+}
+
+// We have taken damage.
+function WheeledVehicleData::onDamage(%this, %obj, %damage)
+{
+   // Collision with other objects, including items
+   warn("Damage:"@%obj@" has taken "@%damage);
+}
+
+function Vehicle::damage(%this, %proj, %pos, %damage, %damageType){
+   echo("Damage Taken:" @ %damage);
+   %this.applyDamage(%damage);
+}
+
+
+function Vehicle::removeSelf(%this){
+   %this.delete();   
+}
+function VehicleData::onDisabled(%this, %obj, %lastState)
+{
+   error("Object Disabled:"@%obj@" Last State:"@%lastState);
+   %obj.regFlow = %obj.fuelFlow;
+   %obj.fuelFlow =.02;
+}
+
+function VehicleData::onEnabled(%this, %obj, %lastState)
+{
+   error("Object Enabled:"@%obj@" Last State:"@%lastState);
+   if(%obj.regFlow  > 0 ){
+      %obj.fuelFlow = %obj.regFlow;
+   }
+}
+
 function VehicleData::onAdd(%this, %obj)
 {
    %obj.setRechargeRate(%this.rechargeRate);

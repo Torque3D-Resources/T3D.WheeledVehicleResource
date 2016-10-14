@@ -682,6 +682,8 @@ Vehicle::Vehicle()
    mWorkingQueryBox.minExtents.set(-1e9f, -1e9f, -1e9f);
    mWorkingQueryBox.maxExtents.set(-1e9f, -1e9f, -1e9f);
    mWorkingQueryBoxCountDown = sWorkingQueryBoxStaleThreshold;
+
+   mCollisionImpulse.set(0,0,0);
 }
 
 U32 Vehicle::getCollisionMask()
@@ -1218,7 +1220,6 @@ void Vehicle::updatePos(F32 dt)
       else
          restCount = 0;
    }
-
    // Integrate forward
    if (!mRigid.atRest)
       mRigid.integrate(dt);
@@ -1241,12 +1242,11 @@ void Vehicle::updatePos(F32 dt)
          F32 collSpeed = collVec.len();
          if (collSpeed > mDataBlock->minImpactSpeed)
             onImpact(collVec);
-         //Con::warnf("Vehicle::collided. Speed:%f",collSpeed);
          //KGB: Implement the collDamageThreshold functionality.
-         if(collSpeed > mDataBlock->collDamageThresholdVel && mDataBlock->collDamageThresholdVel > 0 ){            
-            F32 damage = collSpeed * mDataBlock->collDamageMultiplier;
-            applyDamage(damage); // Update the damage levels and perform callbacks.
-         }
+//         if(collSpeed > mDataBlock->collDamageThresholdVel && mDataBlock->collDamageThresholdVel > 0 ){            
+//            F32 damage = collSpeed * mDataBlock->collDamageMultiplier;
+//            applyDamage(damage); // Update the damage levels and perform callbacks.
+//         }
       }
 
       // Water script callbacks
@@ -1301,12 +1301,39 @@ void Vehicle::updatePos(F32 dt)
 
 //----------------------------------------------------------------------------
 
-void Vehicle::updateForces(F32 /*dt*/)
+void Vehicle::updateForces(F32 dt)
 {
-   // Nothing here.
+   // see if we can add the collision impulse here
+   if(mCollisionImpulse.len() > 0 && isServerObject()){
+      VectorF vec = mCollisionImpulse;
+      vec *= dt;
+      mRigid.applyImpulse(getBoxCenter(), vec);
+      //Point3F test = mCollisionImpulse;
+      mCollisionImpulse.set(0,0,0);
+   }
 }
 
 
+void Vehicle::onCollision( SceneObject *object, const VectorF &vec )
+{
+   Parent::onCollision(object, vec);   // Notify script callbacks.
+
+   if(!isServerObject()) return;
+
+   // Calculate impact speed and force vector 
+   F32 collSpeed = vec.len();
+   VectorF force = vec;
+   force.normalize();
+   force *= (sqrt(collSpeed * 2.5) * object->getMass());   // Use the mass of the object that is hitting us.
+   // Roll collision impulse into updateForces
+   mCollisionImpulse += force;
+   mCollisionImpulse.z = mCollisionImpulse.z > 30.0f ? 30.F : mCollisionImpulse.z;  // Keep things from getting too absurd.
+   // See if it hit us hard enough to do damage.
+   if(collSpeed > mDataBlock->collDamageThresholdVel && mDataBlock->collDamageThresholdVel > 0 ){            
+      F32 damage = collSpeed * mDataBlock->collDamageMultiplier;
+      applyDamage(damage); // Update the damage levels and perform callbacks.
+   } 
+}
 //-----------------------------------------------------------------------------
 /** Update collision information
    Update the convex state and check for collisions. If the object is in
@@ -1805,7 +1832,10 @@ void Vehicle::updateLiftoffDust( F32 dt )
 
 void Vehicle::updateDamageSmoke( F32 dt )
 {
-
+   // KGB: If the vehicle has been cloaked at the shapebase level, don't emit damage smoke.
+   if( (mDamageState == Destroyed && mDataBlock->renderWhenDestroyed == false) || getCloakedState() ){
+      return;
+   }
    for( S32 j=VehicleData::VC_NUM_DAMAGE_LEVELS-1; j>=0; j-- )
    {
       F32 damagePercent = mDamage / mDataBlock->maxDamage;

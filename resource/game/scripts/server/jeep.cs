@@ -277,46 +277,34 @@ function JeepCar::onRemove(%this, %obj)
    
 }
 
-function serverCmdtoggleBrakeLights(%client)
-{
-   %car = %client.player.getControlObject();
-
-   if (%car.getClassName() $= "WheeledVehicle")
+function JeepCar::onBrake(%this, %car, %type){
+   if(%type == 0)
    {
-      if(%car.rightBrakeLight.isEnabled)
-      {
-         %car.rightBrakeLight.setLightEnabled(0);
-         %car.leftBrakeLight.setLightEnabled(0);
-      }
-      else
-      {
-         %car.rightBrakeLight.setLightEnabled(1);
-         %car.leftBrakeLight.setLightEnabled(1);
-      }
+      %car.rightBrakeLight.setLightEnabled(0);
+      %car.leftBrakeLight.setLightEnabled(0);
+   }
+   else
+   {
+      %car.rightBrakeLight.setLightEnabled(1);
+      %car.leftBrakeLight.setLightEnabled(1);
    }
 }
 
-function serverCmdtoggleHeadLights(%client)
-{
-   %car = %client.player.getControlObject();
-
-   if (%car.getClassName() $= "WheeledVehicle")
+function JeepCar::toggleHeadlights(%this, %car){
+   if(%car.rightHeadLight.isEnabled)
    {
-      if(%car.rightHeadLight.isEnabled)
-      {
-         %car.rightHeadLight.setLightEnabled(0);
-         %car.leftHeadLight.setLightEnabled(0);
-         %car.bulbHeadLight.setLightEnabled(0);
-         %car.bulb2HeadLight.setLightEnabled(0);
-      }
-      else
-      {
-         %car.rightHeadLight.setLightEnabled(1);
-         %car.leftHeadLight.setLightEnabled(1);
-         %car.bulbHeadLight.setLightEnabled(1);
-         %car.bulb2HeadLight.setLightEnabled(1);
-      }
+      %car.rightHeadLight.setLightEnabled(0);
+      %car.leftHeadLight.setLightEnabled(0);
+      %car.bulbHeadLight.setLightEnabled(0);
+      %car.bulb2HeadLight.setLightEnabled(0);
    }
+   else
+   {
+      %car.rightHeadLight.setLightEnabled(1);
+      %car.leftHeadLight.setLightEnabled(1);
+      %car.bulbHeadLight.setLightEnabled(1);
+      %car.bulb2HeadLight.setLightEnabled(1);
+   }   
 }
 
 // Callback invoked when an input move trigger state changes when the JeepCar

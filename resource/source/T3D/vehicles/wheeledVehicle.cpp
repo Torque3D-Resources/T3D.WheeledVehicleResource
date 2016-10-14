@@ -49,6 +49,15 @@
 #include "console/engineAPI.h"
 #include "console/consoleInternal.h"
 
+//#include "gfx/gfxDrawUtil.h"
+//#include "gfx/primBuilder.h"
+//#include "gfx/bitmap/gBitmap.h"
+#include "gui/3d/guiTSControl.h"
+#include "T3D/gameFunctions.h"
+//#include "terrain/terrData.h"
+
+
+
 // Collision masks are used to determine what type of objects the
 // wheeled vehicle will collide with.
 static U32 sClientCollisionMask =
@@ -87,6 +96,7 @@ WheeledVehicleTire::WheeledVehicleTire()
    restitution = 1;
    rollingResistance = 0.125f; // Engine Change
    radius = 0.6f;
+   circumference = 1.131f;
    lateralForce = 10;
    lateralDamping = 1;
    lateralRelaxation = 1;
@@ -115,6 +125,8 @@ bool WheeledVehicleTire::preload(bool server, String &errorStr)
       // The tire should be built with it's hub axis along the
       // object's Y axis.
       radius = shape->bounds.len_z() / 2;
+      circumference = M_2PI * radius;
+      //circumInv = 1 / circumference; // save 4 division operations per tick ... is it worth it?
    }
 
    return true;
@@ -202,6 +214,7 @@ void WheeledVehicleTire::packData(BitStream* stream)
    stream->write(longitudinalDamping);
    stream->write(longitudinalRelaxation);
    stream->write(rollingResistance ); // Engine Change
+   stream->write(circumference ); // Engine Change
 }
 
 void WheeledVehicleTire::unpackData(BitStream* stream)
@@ -221,6 +234,7 @@ void WheeledVehicleTire::unpackData(BitStream* stream)
    stream->read(&longitudinalDamping);
    stream->read(&longitudinalRelaxation);
    stream->read(&rollingResistance); // Engine Change
+   stream->read(&circumference); // Engine Change
 }
 
 
@@ -523,13 +537,19 @@ F32 WheeledVehicleEngine::getRPMTorque( F32 RPM) {
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-
 IMPLEMENT_CO_DATABLOCK_V1(WheeledVehicleData);
 
 ConsoleDocClass( WheeledVehicleData,
    "@brief Defines the properties of a WheeledVehicle.\n\n"
    "@ingroup Vehicles\n"
 );
+
+
+IMPLEMENT_CALLBACK( WheeledVehicleData, onBrake, void, ( GameBase* obj, S32 brake, S32 type, F32 brakeLevel ), ( obj, brake, type, brakeLevel ),
+   "@brief Called when the object is removed from the scene.\n\n"
+   "@param obj the GameBase object\n\n"
+   "@see onAdd for an example\n" );
+
 
 WheeledVehicleData::WheeledVehicleData()
 {
@@ -542,7 +562,10 @@ WheeledVehicleData::WheeledVehicleData()
    brakeLightSequence = -1;
    steeringSequence = -1;
    wheelCount = 0;
-
+   freefallGravity = 10;
+   freefallContact = 2;
+   brakeRate = 1;
+   brakeIncrease = 0.01f;
    for (S32 i = 0; i < MaxSounds; i++)
       sound[i] = 0;
 }
@@ -707,6 +730,22 @@ void WheeledVehicleData::initPersistFields()
       "@brief Torque applied when braking.\n\n"
       "This controls how fast the vehicle will stop when the brakes are applied." );
    
+   addField("freefallGravity", TypeF32, Offset(freefallGravity, WheeledVehicleData),
+      "@brief Gravity multiplier when vehicle is in freefall.\n\n"
+      "This controls how fast the vehicle will stop when the brakes are applied." );
+   addField("freefallContact", TypeS32, Offset(freefallContact, WheeledVehicleData),
+      "@brief Number of wheels in contact for freefall.\n\n"
+      "This controls how many wheels in contact with the ground will initiate free-fall gravity." );
+
+
+   addField("brakeRate", TypeF32, Offset(brakeRate, WheeledVehicleData),
+      "@brief Base rate of increase torque per second.\n\n"
+      "Will increase by this much per second until brakeTorque is reached." );
+   addField("brakeIncrease", TypeF32, Offset(brakeIncrease, WheeledVehicleData),
+      "@brief A scalar value to increase the base rate as brakes are applied.\n\n"
+      "allows an increasing curve of brake pressure [baserate + (baserate * brakeIncrease) ] ." );
+
+
    Parent::initPersistFields();
 }
 
@@ -729,6 +768,10 @@ stream->write(maxWheelSpeed);
    stream->write(engineTorque);
    stream->write(engineBrake);
    stream->write(brakeTorque);
+   stream->write(freefallGravity);
+   stream->write(freefallContact);
+   stream->write(brakeRate);
+   stream->write(brakeIncrease);
 }
 
 void WheeledVehicleData::unpackData(BitStream* stream)
@@ -747,6 +790,10 @@ void WheeledVehicleData::unpackData(BitStream* stream)
    stream->read(&engineTorque);
    stream->read(&engineBrake);
    stream->read(&brakeTorque);
+   stream->read(&freefallGravity);
+   stream->read(&freefallContact);
+   stream->read(&brakeRate);
+   stream->read(&brakeIncrease);
 }
 
 
@@ -782,6 +829,8 @@ WheeledVehicle::WheeledVehicle()
       mWheel[i].steering = 0;
       mWheel[i].powered = true;
       mWheel[i].slipping = false;
+      mWheel[i].rpm = 0;
+      mWheel[i].rot = 0;
    }
 
  /***KGB: Advanced Vehicle Default Settings*/
@@ -804,6 +853,11 @@ WheeledVehicle::WheeledVehicle()
    mWheelVel = 0.0f;
    inPark=true;
    mForceBraking=false;
+
+   mGravityAccum = 0.0f;
+   mBrakeLevel = 0.0f;
+
+   //mGravityMultiplier = 10.0f;
    /* End of Engine Change */
 }
 
@@ -820,7 +874,7 @@ void WheeledVehicle::initPersistFields()
 	addField( "forceBrake", TypeBool, Offset(mForceBraking, WheeledVehicle),"@brief ");
 	addField( "brakeTrigger", TypeS8, Offset(mBrakeTrigger, WheeledVehicle),"@brief Move manager trigger that brakes should respond to.");
 	// addField( "autoTrans", TypeBool, Offset( useAutomatic, WheeledVehicle ),"@brief ");
-	// addField( "rpm", TypeF32, Offset( mEngineRPM, WheeledVehicle ),"@brief ");    
+	//addField( "gravityMultiplier", TypeF32, Offset( mGravityMultiplier, WheeledVehicle ),"@brief ");    
 }
 
 
@@ -907,6 +961,8 @@ bool WheeledVehicle::onNewDataBlock(GameBaseData* dptr, bool reload)
       wheel->apos = 0;
       wheel->extension = 1;
       wheel->slip = 0;
+      wheel->rpm = 0;
+      wheel->rot = 0;
 
       wheel->springThread = 0;
       wheel->emitter = 0;
@@ -1180,19 +1236,22 @@ void WheeledVehicle::processTick(const Move* move)
 void WheeledVehicle::updateMove(const Move* move)
 {
    Parent::updateMove(move);   
+   if(!mEngine){
+      // Brake on trigger
+      if(mBraking != move->trigger[mBrakeTrigger] && isServerObject() ){
+           // Brake state has changed; issue script callback; brakeType = both e-brake; level = full torque or 0.
+         mDataBlock->onBrake_callback( this, move->trigger[mBrakeTrigger], 3, move->trigger[mBrakeTrigger] ? mDataBlock->brakeTorque : 0 );
+      }
+      mBraking = move->trigger[mBrakeTrigger]; 
+      // Set the tail brake light thread direction based on the brake state.
+      if (mTailLightThread)
+         mShapeInstance->setTimeScale(mTailLightThread, mBraking? 1.0f : -1.0f);
 
-   // Brake on trigger
-   mBraking = move->trigger[mBrakeTrigger];  // KGB - add flexibility for the move trigger.
-   //mBraking = move->trigger[4];  // KGB - moved this from 2 to reduce jump conflict
+      return;
+   }
 
-   // Set the tail brake light thread direction based on the brake state.
-   if (mTailLightThread)
-      mShapeInstance->setTimeScale(mTailLightThread, mBraking? 1.0f : -1.0f);
 
-	/*** KGB: ***/
-
-   if(!mEngine) return;
-
+   bool brake = false;
    F32 fFlow = mFuelFlow; // Drop fuel flow into a temp variable - this is increased
                           // when in neutral to rev the motor quickly.
 
@@ -1217,25 +1276,12 @@ void WheeledVehicle::updateMove(const Move* move)
       mEngineRPM -= eDrag;
    }
 
-   // Get the gear ratio for the current gear
-   F32 gR=0;
-   if(mCurGear == -1 )
-      gR = mEngine->reverseRatio;
-   else if(mCurGear == 0 ) {  
-      if (mEngine->useAutomatic == false)
-      {    
-         // This makes the motor rev faster in neutral         
-         fFlow = mFuelFlow * mEngine->neutralBoost;
-      }
-      // In neutral, use first gear ratio for base torque
-      gR = mEngine->gearRatios[mCurGear]; 
-      }
-   else if(mCurGear > 0)
-      gR = mEngine->gearRatios[mCurGear-1];
 
+
+   F32 gR=gearRatio();
    // Find the torque for the current RPM level
    F32 rTq = mEngine->getRPMTorque(mEngineRPM) * gR;  // Less torqe at lower gear ratios   
-   F32 tTq = rTq; // Temporary to see where we started for debugging
+   //F32 tTq = rTq; // Temporary to see where we started for debugging
    
    // OK, this is here to avoid a "stall" condition in first gear (if desired)   
    if (mEngineRPM < mEngine->minEngineRPM) mEngineRPM = mEngine->minEngineRPM;
@@ -1283,26 +1329,31 @@ void WheeledVehicle::updateMove(const Move* move)
             // We are going backward .... add to RPM
             mEngineRPM += rTq * fFlow;
          } else {
-            // This is going forward ....set some braking
-            mEngineRPM -= rTq * fFlow;
-            mSlowDown += rTq * mEngine->slowDownRate;
+
             // When they reach 0.  Then switch into reverse.
             if (mWheelRPM <= 5){
                mEngineRPM = 500;
                mGearDelay = 8;
                setGear(-1);
+            } else {
+               // This is going forward ....set some braking
+               mEngineRPM -= rTq * fFlow;
+               mSlowDown += rTq * mEngine->slowDownRate;
+               brake=true;
             }
          }
       }else if (mThrottle > 0){
          if (mCurGear == -1) {
-            // We are going backward .... bleed off some RPMs
-            mEngineRPM -= rTq * fFlow;
-            mSlowDown += rTq * mEngine->slowDownRate;
             // When they reach 0.  Then switch into forward.
             if (mWheelRPM <= 5){
                mEngineRPM = 500;
                mGearDelay = 8;
                setGear(0);               
+            } else {
+               // We are going backward .... bleed off some RPMs
+               mEngineRPM -= rTq * fFlow;
+               mSlowDown += rTq * mEngine->slowDownRate;
+               brake=true;
             }
          } else {
             // Going forward ....add to the RPM
@@ -1315,6 +1366,7 @@ void WheeledVehicle::updateMove(const Move* move)
          // Negative throttle input - always brake the engine with manual
          mEngineRPM -= rTq * fFlow;
          mSlowDown += rTq * mEngine->slowDownRate;
+         brake=true;
       } else if (mThrottle > 0){
          // Positive throttle input - always accelerate the engine with manual
          mEngineRPM += rTq * fFlow;       
@@ -1363,7 +1415,7 @@ void WheeledVehicle::updateMove(const Move* move)
          } else if (mCurGear <0){
             if( mEngineRPM < mEngine->shiftDownRPM && mThrottle >= 0) {
                // Always shift up into neutral
-				//Con::warnf("Up Shift(rev): %i",mCurGear);
+   				//Con::warnf("Up Shift(rev): %i",mCurGear);
                mCurGear = 0;
                //Con::executef(mDataBlock,4,"onShift",scriptThis(), Con::getIntArg(mCurGear), Con::getIntArg(mEngineRPM));
 			   mEngine->onShift_callback( this, mCurGear, mEngineRPM );
@@ -1372,28 +1424,37 @@ void WheeledVehicle::updateMove(const Move* move)
          }
       		
 	}
+   // Brake on trigger - go full-on; consider emergency brake;
+   S32 brakeType = 0;
+   if(brake){
+      brakeType = 1; // Regular brake
+      if(mBrakeLevel < mDataBlock->brakeTorque){
+         mBrakeLevel +=  (mBrakeLevel * mDataBlock->brakeIncrease) + mDataBlock->brakeRate;
+         if(mBrakeLevel > mDataBlock->brakeTorque)
+            mBrakeLevel =  mDataBlock->brakeTorque;
+      }
+   } 
+   if(move->trigger[mBrakeTrigger]){
+      mBrakeLevel = mDataBlock->brakeTorque;
+      brakeType == 1 ? 3 : 2; // e-brake == 2, both == 3
+   }
+   if(!move->trigger[mBrakeTrigger] && !brake){
+      mBrakeLevel = 0;  // no trigger or "moveBackward" braking - pull out brake level
+      brakeType = 0;
+   }
+   bool newBrake = move->trigger[mBrakeTrigger] || brake;   
+   //if(mBraking != move->trigger[mBrakeTrigger] && mBraking != brake ){
+   if(mBraking != newBrake && isServerObject() ){
+      // Brake state has changed; issue script callback
+      //Con::executef(mDataBlock,4,"onBrake",getIdString(), Con::getIntArg(newBrake),Con::getIntArg(brakeType) );
+      mDataBlock->onBrake_callback( this, newBrake, brakeType, mBrakeLevel );
+   }
 
-/* KGB End*/
-
-
-/***KGB: ***/
-   // Steering return-to-center based on original resource by James Jacoby
-   //if (mCenterSteeringRate >0.0f)
-   //{
-   //   F32 returnSpeed = mFabs( move->y * mCenterSteeringRate ); // based on forward/backward motion
-   //   if( mSteering.x > 0.0f )
-   //   {
-   //      mSteering.x -= returnSpeed;
-   //      mSteering.x < 0.0f ? 0.0f : mSteering.x;  // KGB: make sure we don't go past zero
-   //   }else if( mSteering.x < 0.0f )
-   //   {
-   //      mSteering.x += returnSpeed;
-   //      mSteering.x > 0.0f ? 0.0f : mSteering.x;  // KGB: make sure we don't go past zero
-   //   }
-   //}
-/* KGB End */
-
-
+   //mBraking = move->trigger[mBrakeTrigger]; 
+   mBraking = newBrake;
+   // Set the tail brake light thread direction based on the brake state.
+   if (mTailLightThread)
+      mShapeInstance->setTimeScale(mTailLightThread, mBraking? 1.0f : -1.0f);
 
 }
 
@@ -1427,6 +1488,12 @@ void WheeledVehicle::advanceTime(F32 dt)
          // Keep track of largest slip
          slipTotal += wheel->slip;
          torqueTotal += wheel->torqueScale;
+
+
+         //F32 rps = ((wheel->rpm / 60) * dt) * 360;
+         //wheel->rot += rps;
+         //if( mFabs(wheel->rot) > 360)
+         //      wheel->rot = mFmod(wheel->rot,360);         
       }
 
    // Update the sounds based on wheel slip and torque output
@@ -1460,7 +1527,7 @@ void WheeledVehicle::advanceTime(F32 dt)
 void WheeledVehicle::updateForces(F32 dt)
 {
    PROFILE_SCOPE( WheeledVehicle_UpdateForces );
-
+   Parent::updateForces(dt);
    if(mEngine){
 	   updateEngineForces(dt);
 	   return;
@@ -1582,8 +1649,7 @@ void WheeledVehicle::updateForces(F32 dt)
 
          // Spring forces act straight up and are applied at the
          // spring's root position.
-         //Point3F t, forceVector = bz * (spring + damping + antiSway);
-         Point3F t, forceVector = wheel->data->pos * (spring + damping + antiSway);  // KGB: The animated hub at position 0 ends up being a closer approximation to the spring root than the vehicle mass center.
+         Point3F t, forceVector = bz * (spring + damping + antiSway);         
          mCross(r, forceVector, &t);
          mRigid.torque += t;
          mRigid.force += forceVector;
@@ -1591,6 +1657,7 @@ void WheeledVehicle::updateForces(F32 dt)
          // Tire direction vectors perpendicular to surface normal
          Point3F wheelXVec = bx * cosSteering;
          wheelXVec += by * sinSteering * wheel->steering;
+
          Point3F tireX, tireY;
          mCross(wheel->surface.normal, wheelXVec, &tireY);
          tireY.normalize();
@@ -1654,8 +1721,7 @@ void WheeledVehicle::updateForces(F32 dt)
          // Tire forces act through the tire direction vectors parallel
          // to the surface and are applied at the wheel hub.
          forceVector = (tireX * Fx) + (tireY * Fy);
-         pos -= bz * (wheel->spring->length * wheel->extension);
-         mRigid.getOriginVector(pos,&r);
+         pos.z -= bz.z * (wheel->spring->length * wheel->extension);
          mCross(r, forceVector, &t);
          mRigid.torque += t;
          mRigid.force += forceVector;
@@ -1732,6 +1798,58 @@ void WheeledVehicle::updateForces(F32 dt)
       mRigid.setAtRest();
 }
 
+// ----------------------------------------------------------------------
+
+F32 WheeledVehicle::applyTransmissionRatios(F32 engineRPM){
+   // Instead of one monster equation, I broke this out so it made more sense   
+   F32 gR = gearRatio();     // Gear ratio for current gear
+   F32 tRPM;   // RPM from transmission
+   F32 dRPM;   // Transmission and differental combo
+   F32 rMass;  // Resistance = mass/(speed * gear ratio)
+   F32 wRPM;   // Final wheel RPM
+
+   tRPM = mEngineRPM / gR;  // This is the ratio of Engine to transmission
+   dRPM = tRPM / mEngine->differentalRatio; // This is the ratio of Transmission to differental
+   rMass = mMass / (getVelocity().len() + dRPM);
+   if ( rMass > dRPM){
+      wRPM = 0.0f;
+   }else{
+      wRPM = dRPM - rMass;
+   }
+   if( inPark ) {
+	   wRPM = 0.0f;
+   }
+   return wRPM;
+}
+
+F32 WheeledVehicle::gearRatio(){
+   return gearRatio(mCurGear);
+}
+
+F32 WheeledVehicle::gearRatio(S32 gear){
+   if (mCurGear == -1){
+      return mEngine->reverseRatio;
+   } else if (mCurGear == 0){
+      return mEngine->gearRatios[mCurGear];
+   }
+   if(mCurGear <= mEngine->numGearRatios){
+     return mEngine->gearRatios[mCurGear-1];
+   }
+   Con::errorf("WheeledVehicle::gearRatio - Invalid gear: %d",gear);
+   return 0;
+}
+
+// Calculate wheel RPM based on velocity and wheel circumference
+F32 WheeledVehicle::rpmFromVel(F32 vel, F32 circumference){
+   if(circumference == 0) return 0;
+   F32 rv;
+   F32 d1 = mFabs(vel) * 60;  // velocity traveled in 60 seconds
+   rv = d1 / circumference;   // divided by the circumference of the wheel
+   rv = rv >= 1 ? rv : 0;     // ditch rpm values less than one.
+   return rv;
+}
+
+// --------------------------------------------------------------------------
 void WheeledVehicle::updateEngineForces(F32 dt)
 {
    PROFILE_SCOPE( WheeledVehicle_UpdateEngineForces );
@@ -1757,8 +1875,6 @@ void WheeledVehicle::updateEngineForces(F32 dt)
    // Calculate Engine and brake torque values used later in
    // wheel calculations.
    F32 brakeVel;
-
-/*** KGB */   
    if( mBraking || mForceBraking ) {
 	   brakeVel = (mDataBlock->brakeTorque / aMomentum) * dt;      
    } else {
@@ -1768,56 +1884,8 @@ void WheeledVehicle::updateEngineForces(F32 dt)
 	   brakeVel += ((2.0f*mDataBlock->brakeTorque)/aMomentum)*dt;      
    }   
 
-   // Instead of one monster equation, I broke this out so it made more sense   
-   F32 gR;     // Gear ratio for current gear
-   F32 tRPM;   // RPM from transmission
-   F32 dRPM;   // Transmission and differental combo
-   F32 rMass;  // Resistance = mass/(speed * gear ratio)
-   F32 wRPM;   // Final wheel RPM
-   if (mCurGear == -1){
-      gR = mEngine->reverseRatio;
-   } else if (mCurGear == 0){
-      gR = mEngine->gearRatios[mCurGear];
-   }else{
-      gR = mEngine->gearRatios[mCurGear-1];
-   }   
-   tRPM = mEngineRPM / gR;  // This is the ratio of Engine to transmission
-   dRPM = tRPM / mEngine->differentalRatio; // This is the ratio of Transmission to differental
-   rMass = mMass / (getVelocity().len() + tRPM);	// TODO: Should be dRPM?
-   if ( rMass > dRPM){
-      wRPM = 0.0f;
-   }else{
-      wRPM = dRPM - rMass;
-   }
-   if( inPark ) {
-	   wRPM = 0.0f;
-   }
-/*** KGB End*/
-   /*
-   F32 engineTorque,brakeVel;
-   if (mBraking) 
-   {
-      brakeVel = (mDataBlock->brakeTorque / aMomentum) * dt;
-      engineTorque = 0;
-   }
-   else 
-   {
-      if (mThrottle) 
-      {
-         engineTorque = mDataBlock->engineTorque * mThrottle;
-         brakeVel = 0;
-         // Double the engineTorque to help out the jets
-         if (mThrottle > 0 && mJetting)
-            engineTorque *= 2;
-      }
-      else 
-      {
-         // Engine brake.
-         brakeVel = (mDataBlock->engineBrake / aMomentum) * dt;
-         engineTorque = 0;
-      }
-   }
-*/
+   // Scale engine rpm rolled in from last tick with current transmission settings.
+   F32 wRPM = applyTransmissionRatios(mEngineRPM);
 
    // Integrate forces, we'll do this ourselves here instead of
    // relying on the rigid class which does it during movement.
@@ -1848,29 +1916,44 @@ void WheeledVehicle::updateEngineForces(F32 dt)
    }
    if (contactCount)
       verticalLoad /= contactCount;
-   
-   /***KGB: Stuff I need both in the loop at at the bottom */
-   F32 tAvel = 0.0f;      
-   // One round-about way to translate wheel RPM into distance traveled
-   F32 wC = M_2PI * wR; // Wheel Circumference
-   F32 wD = wC * wRPM;  // This is the distance traveled in a minute
-   F32 wV = wD / 60.0f;
 
+   if (contactCount > 2){
+      mGravityAccum = 0;  // Wheels have contact, so we aren't in freefall.
+   } else {
+      mGravityAccum += dt; // If no wheels have contact, accumulate the time to apply to gravity.
+   }
+   
+   mWheelRPM = 0.0f; // Clear here and set after RPM is calculated for individual wheels.
    // Sum up spring and wheel torque forces
    for (Wheel* wheel = mWheel; wheel < wend; wheel++)  
    {
       if (!wheel->tire || !wheel->spring)
          continue;
 
+      if (wheel->powered){
+         wheel->rpm = applyTransmissionRatios(mEngineRPM);  // apply engine power
+      } else {
+         // If not powered, the wheel should only spin as fast as the vehicle
+         wheel->rpm = rpmFromVel(getVelocity().len(), wheel->tire->circumference);  
+      }
+
+      F32 cV = distPerSec(wheel->rpm, wheel->tire->circumference);   // Get the wheel velocity for the current RPMs
       F32 Fy = 0;
+
+      // First, let's compute the wheel's position, and worldspace velocity
+      Point3F pos, r, localVel;
+      currMatrix.mulP(wheel->data->pos, &pos);
+      mRigid.getOriginVector(pos,&r);
+      mRigid.getVelocity(r, &localVel);
+
+
       if (wheel->surface.contact) 
       {
-
          // First, let's compute the wheel's position, and worldspace velocity
-         Point3F pos, r, localVel;
-         currMatrix.mulP(wheel->data->pos, &pos);
-         mRigid.getOriginVector(pos,&r);
-         mRigid.getVelocity(r, &localVel);
+         //Point3F pos, r, localVel;
+         //currMatrix.mulP(wheel->data->pos, &pos);
+         //mRigid.getOriginVector(pos,&r);
+         //mRigid.getVelocity(r, &localVel);
 
          // Spring force & damping
          F32 spring  = wheel->spring->force * (1 - wheel->extension);
@@ -1987,6 +2070,16 @@ void WheeledVehicle::updateEngineForces(F32 dt)
       else 
       {
          // Wheel not in contact with the ground
+         
+         // If we are in "freefall" apply accumulated gravity at the wheel hub
+         /*
+         if(mGravityAccum > 0){
+            Point3F t, forceVector = Point3F(0,0,(sWheeledVehicleGravity * mGravityAccum * aMomentum * mDataBlock->freefallGravity));
+            mCross(r, forceVector, &t);
+            mRigid.torque += t;
+            mRigid.force += forceVector;
+         }
+         */
          wheel->torqueScale  = 0;
          wheel->slip = 0;
 
@@ -1999,21 +2092,18 @@ void WheeledVehicle::updateEngineForces(F32 dt)
 
       // Adjust the wheel's angular velocity based on engine torque
       // and tire deformation forces.
-
       F32 resistVel = 0.0f;
 	   if( wheel->surface.contact ) {
 		  resistVel = mFabs(wheel->avel) * wheel->tire->rollingResistance * dt;
 	   }
-
-/*** KGB */      
+    
       F32 eDrag = 0.0f;
-      if (wheel->powered && mCurGear != 0){         
+      if (wheel->powered && mCurGear != 0){
          // The wheel RPMs should have increased the velocity of the vehicle
          // If the vehicle is roughly stopped, we should stop the wheel.
-
-         if (mWheelRPM > 500 && getVelocity().len() < 7 && mCurGear != 0){
+         if (wheel->rpm > 500 && getVelocity().len() < 7 && mCurGear != 0){
             // The wheels are moving, but the vehicle is not, stop the wheels?            
-            F32 nVel = wV - (mEngine->overRevSlowdown *2);
+            F32 nVel = cV - (mEngine->overRevSlowdown *2);
             if (mCurGear == -1){
                wheel->avel = -nVel;
             }else{
@@ -2024,18 +2114,15 @@ void WheeledVehicle::updateEngineForces(F32 dt)
             //mEngineRPM = mEngine->idleEngineRPM;
             // setGear(0);
          } else {
-
-
             if(mThrottle!=0 ||  mCurGear == 1 || mCurGear == -1)
-            //if(mThrottle!=0)
             {
                // This is the powered wheel velocity, if the wheels are already going 
                // faster, don't slow them down
-               if (wV > mFabs(wheel->avel)){
+               if (cV > mFabs(wheel->avel)){
                   if (mCurGear == -1){
-                     wheel->avel = -wV;
+                     wheel->avel = -cV;
                   }else{
-                     wheel->avel = wV;                  
+                     wheel->avel = cV;
                   }
                }else{
                   eDrag = mEngineRPM * mEngine->engineDrag * dt;
@@ -2046,15 +2133,13 @@ void WheeledVehicle::updateEngineForces(F32 dt)
             }
          }
       }
-
       // Check speed, and copy in the lateral and deformation forces
-      if ( (getVelocity().len() < .5 && mThrottle == 0 && (mEngine->useAutomatic == true || mCurGear > 1)) || ((wheel->avel <0 && mCurGear >0) || (wheel->avel >0 && mCurGear <0)) ) {
+      if ( (getVelocity().len() < .5 && mThrottle == 0 && (mEngine->useAutomatic == true || mCurGear > 1)) || ((wheel->avel <0 && mCurGear >0 && mThrottle == 0) || (wheel->avel >0 && mCurGear <0 && mThrottle == 0)) ) {
          // Stop if movement gets insanely slow
          wheel->avel  = 0;
       }else{         
          wheel->avel += (( - Fy * wheel->tire->radius) / aMomentum) * dt ;
       }
-   
       // Now we've increased wheel RPMs and converted to velocity if the engine
       // has provided extra power.  Next we need to subtract out any drag or 
       // braking from the wheel velocity.
@@ -2071,24 +2156,28 @@ void WheeledVehicle::updateEngineForces(F32 dt)
 	      else
 		      wheel->avel += lbrakeVel;
 
-      // Keep track of the greatest angular wheel velocity
-      if (mFabs(wheel->avel) > mFabs(tAvel) )
-         tAvel = wheel->avel;
+      // At this stage, the rigid body has been updated with last tick's forces and should
+      // roughly match the wheel RPM until that value is updated.
 
+      // Calculate the wheel RPM going into the next tick.
+      //wheel->rpm = rpmFromVel(wheel->avel, wheel->tire->circumference); // Do we want to defer this until next tick?
+      /*
+      if (wheel->powered){
+         wheel->rpm = rpmFromVel(wheel->avel, wheel->tire->circumference);
+      } else {        
+         wheel->rpm = rpmFromVel(getVelocity().len(), wheel->tire->circumference);  
+      }*/
+      F32 newRpm;
+      newRpm = rpmFromVel(wheel->avel, wheel->tire->circumference);
 
+      // Store values from fastest powered wheel and use next tick to calculate RPM drop
+      // on shift and engine slowdown. Wheel rpm is set next tick based on engine output.
+      if(wheel->powered && newRpm > mWheelRPM) {
+         mWheelVel = wheel->avel;
+         mWheelRPM = wheel->rpm;
+      }
    }
-   mWheelVel = tAvel;   // Highest wheel angular velocity - use to check forward/backward 
-                        // wheel direction, regardless of gear selection
 
-   // At this stage, the rigid body has been updated with last tick's forces and should
-   // roughly match the wheel RPMs until that value is updated.
-
-
-   // Take the adjusted aVel and calculate the wheel RPM going into the next
-   // tick to use in the calculation of RPM drop on shift.
-   F32 d1 = mFabs(mWheelVel) * 60;   // velocity traveled in 60 seconds
-   mWheelRPM = (d1 / wC)>=1?d1/wC:0;   // divided by the circumference of the wheel
-   
    // Finally, check the wheel RPMs and slow down the motor RPMs to match
    // if the throttle is not on - or if the engine is over-revved
    bool fT = false; // Forward Throttle Check
@@ -2098,15 +2187,10 @@ void WheeledVehicle::updateEngineForces(F32 dt)
       fT = true;
    }
    
-   F32 neRPM = mWheelRPM * gR * mEngine->differentalRatio;  // Calculated new engine RPM
+   F32 neRPM = mWheelRPM * gearRatio() * mEngine->differentalRatio;  // Calculated new engine RPM
    if ((!fT && mContPowered && mWheelRPM > 0 && !mCurGear == 0) || neRPM > mEngine->maxEngineRPM ){
       mEngineRPM = neRPM;
    }
-
-
-
-/*** KGB End   */
-
 
    // Jet Force
    if (mJetting)
@@ -2126,7 +2210,7 @@ void WheeledVehicle::updateEngineForces(F32 dt)
       mRigid.atRest = false;
 
    // Gravity
-   mRigid.force += Point3F(0, 0, sWheeledVehicleGravity * mRigid.mass);
+   mRigid.force += Point3F(0, 0, (sWheeledVehicleGravity * mRigid.mass) + (sWheeledVehicleGravity * mGravityAccum * mRigid.mass * mDataBlock->freefallGravity) );
 
    // Integrate and update velocity
    mRigid.linMomentum += mRigid.force * dt;
@@ -2294,15 +2378,6 @@ void WheeledVehicle::updateWheelParticles(F32 dt)
       }
    }
 }
-
-
-
-//#include "gfx/gfxDrawUtil.h"
-//#include "gfx/primBuilder.h"
-//#include "gfx/bitmap/gBitmap.h"
-#include "gui/3d/guiTSControl.h"
-#include "T3D/gameFunctions.h"
-//#include "terrain/terrData.h"
 
 //----------------------------------------------------------------------------
 /** Update engine sound
@@ -2535,9 +2610,17 @@ void WheeledVehicle::prepBatchRender(SceneRenderState* state, S32 mountedImageIn
          hub.setColumn(3,pos);
 
          GFX->multWorld(hub);
-
+         MatrixF rot;
          // Wheel rotation
-         MatrixF rot(EulerF(wheel->apos * M_2PI,0,0));
+         /*
+         if(mEngine){
+            F32 spinAngle = mDegToRad(wheel->rot);
+            rot = MatrixF(EulerF(spinAngle, 0.0, 0.0));
+         } else {
+            rot = MatrixF(EulerF(wheel->apos * M_2PI,0,0));
+         }
+         */
+         rot = MatrixF(EulerF(wheel->apos * M_2PI,0,0));
          GFX->multWorld(rot);
 
          // Rotation the tire to face the right direction
@@ -2576,6 +2659,8 @@ void WheeledVehicle::writePacketData(GameConnection *connection, BitStream *stre
       stream->write(wheel->Dy);
       stream->write(wheel->Dx);
       stream->writeFlag(wheel->slipping);
+      stream->write(wheel->rpm);
+      stream->write(wheel->rot);
    }
    // *Engine change
    stream->write( mCurGear );
@@ -2603,6 +2688,8 @@ void WheeledVehicle::readPacketData(GameConnection *connection, BitStream *strea
       stream->read(&wheel->Dy);
       stream->read(&wheel->Dx);
       wheel->slipping = stream->readFlag();
+      stream->write(wheel->rpm);
+      stream->write(wheel->rot);
    }
 
    // Rigid state is transmitted by the parent...
@@ -2681,6 +2768,7 @@ U32 WheeledVehicle::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
          stream->write(wheel->avel);
          stream->write(wheel->Dy);
          stream->write(wheel->Dx);
+         stream->write(wheel->rpm);
       }
    }
    // *Engine Change
@@ -2756,6 +2844,7 @@ void WheeledVehicle::unpackUpdate(NetConnection *con, BitStream *stream)
          stream->read(&wheel->avel);
          stream->read(&wheel->Dy);
          stream->read(&wheel->Dx);
+         stream->read(&wheel->rpm);
       }
    }
    // *Engine Change

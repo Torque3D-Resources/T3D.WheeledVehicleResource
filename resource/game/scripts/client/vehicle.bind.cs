@@ -79,31 +79,28 @@ function carjack()
    }
 }
 
-// Bind the keys to the carjack command
-moveMap.bindCmd(keyboard, "ctrl z", "carjack();", "");
-
-
-// The key command for flipping the car
-vehicleMap.bindCmd(keyboard, "ctrl x", "commandToServer(\'flipCar\');", "");
-
 function getOut()
 {
-   //vehicleMap.pop();
-   //moveMap.push();
    commandToServer('dismountVehicle');
 }
 
-function brakeLights()
-{
-   // Turn on/off the Cheetah's head lights.
-   commandToServer('toggleBrakeLights');
+function headLights(){
+   commandToServer('toggleHeadlights');
 }
 
 function brake(%val)
 {
-   commandToServer('toggleBrakeLights');
    $mvTriggerCount[$pref::vehicle::brakeTrigger]++;
 }
+
+
+// Bind the keys to the carjack command
+moveMap.bindCmd(keyboard, "ctrl z", "carjack();", "");
+
+// The key command for flipping the car
+vehicleMap.bindCmd(keyboard, "ctrl x", "commandToServer(\'flipCar\');", "");
+
+
 vehicleMap.bindCmd(keyboard, "escape", "", "handleEscape();");
 //vehicleMap.bind( keyboard, w, moveforward ); // Original TGE
 vehicleMap.bind( keyboard, w, accelerate );
@@ -116,7 +113,7 @@ vehicleMap.bind( mouse, button0, mouseFire );
 vehicleMap.bind( mouse, button1, altTrigger );
 vehicleMap.bindCmd(keyboard, "ctrl f","getout();","");
 vehicleMap.bind(keyboard, space, brake);
-vehicleMap.bindCmd(keyboard, "l", "brakeLights();", "");
+vehicleMap.bindCmd(keyboard, "l", "headLights();", "");
 vehicleMap.bind( keyboard, v, toggleFreeLook ); // v for vanity
 //vehicleMap.bind(keyboard, tab, toggleFirstPerson );
 vehicleMap.bind(keyboard, "alt c", toggleCamera);
