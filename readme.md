@@ -14,5 +14,10 @@
 <li>In-game vehicle datablock/settings editor gui</li>
 </ul>
 <hr width=75%>
-<h3><a href="#">Download</a></h3>
+Note: This is an unreleased work in progress ... generally all required files will be here and in the proper version to work together, but this repo is still in the process of being built.
+<hr width=75%>
+Note2: The build seems to work most easily if the shapebase files go directly in the engine directory.
+<hr width=75%>
+This resource is currently based on T3D 3.8.
+<!-- <h3><a href="#">Download</a></h3> -->
 <h3><a href="./docs/readme.md">Docs</a></h3>
