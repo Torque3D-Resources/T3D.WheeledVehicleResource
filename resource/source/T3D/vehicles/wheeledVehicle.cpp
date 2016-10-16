@@ -1266,7 +1266,6 @@ void WheeledVehicle::updateMove(const Move* move)
    }
    
    // Check manual transmission, in neutral, no throttle, engineRPM > idle.   
-   // ** Addition:
    // Check automatic transmission, no throttle, no powered contact, engineRPM > idle
    // This makes the reved motor drop RPM when in neutral or upside down/high centered in automatic.
    if ( (mCurGear == 0 && mEngine->useAutomatic == false && mEngineRPM > mEngine->idleEngineRPM && mThrottle == 0) ||
@@ -1281,9 +1280,8 @@ void WheeledVehicle::updateMove(const Move* move)
    F32 gR=gearRatio();
    // Find the torque for the current RPM level
    F32 rTq = mEngine->getRPMTorque(mEngineRPM) * gR;  // Less torqe at lower gear ratios   
-   //F32 tTq = rTq; // Temporary to see where we started for debugging
    
-   // OK, this is here to avoid a "stall" condition in first gear (if desired)   
+   // Avoid a "stall" condition in first gear (if desired)   
    if (mEngineRPM < mEngine->minEngineRPM) mEngineRPM = mEngine->minEngineRPM;
 
    // Simulate mass resistance - keeps the lower gear ratios from being used
@@ -1337,8 +1335,8 @@ void WheeledVehicle::updateMove(const Move* move)
                setGear(-1);
             } else {
                // This is going forward ....set some braking
-               mEngineRPM -= rTq * fFlow;
-               mSlowDown += rTq * mEngine->slowDownRate;
+               //mEngineRPM -= rTq * fFlow;
+               //mSlowDown += rTq * mEngine->slowDownRate;
                brake=true;
             }
          }
@@ -1351,8 +1349,8 @@ void WheeledVehicle::updateMove(const Move* move)
                setGear(0);               
             } else {
                // We are going backward .... bleed off some RPMs
-               mEngineRPM -= rTq * fFlow;
-               mSlowDown += rTq * mEngine->slowDownRate;
+               //mEngineRPM -= rTq * fFlow;
+               //mSlowDown += rTq * mEngine->slowDownRate;
                brake=true;
             }
          } else {
@@ -1381,8 +1379,7 @@ void WheeledVehicle::updateMove(const Move* move)
    if( mEngine->useAutomatic ) {
 	   if (mGearDelay>0){
 			mGearDelay--;
-			return;
-	   }
+	   } else {
 
          if (mCurGear > 0) {
 			   int nGear = mCurGear;
@@ -1422,7 +1419,7 @@ void WheeledVehicle::updateMove(const Move* move)
                mGearDelay = 8;
             }
          }
-      		
+      }
 	}
    // Brake on trigger - go full-on; consider emergency brake;
    S32 brakeType = 0;
@@ -1433,23 +1430,24 @@ void WheeledVehicle::updateMove(const Move* move)
          if(mBrakeLevel > mDataBlock->brakeTorque)
             mBrakeLevel =  mDataBlock->brakeTorque;
       }
+      newBrake = true;
+      //if(isServerObject()) Con::printf("Brake Lvl:%f",mBrakeLevel);
    } 
    if(move->trigger[mBrakeTrigger]){
       mBrakeLevel = mDataBlock->brakeTorque;
       brakeType == 1 ? 3 : 2; // e-brake == 2, both == 3
+      newBrake = true;
    }
    if(!move->trigger[mBrakeTrigger] && !brake){
       mBrakeLevel = 0;  // no trigger or "moveBackward" braking - pull out brake level
       brakeType = 0;
-   }
-   bool newBrake = move->trigger[mBrakeTrigger] || brake;   
+   }   
    //if(mBraking != move->trigger[mBrakeTrigger] && mBraking != brake ){
    if(mBraking != newBrake && isServerObject() ){
       // Brake state has changed; issue script callback
       //Con::executef(mDataBlock,4,"onBrake",getIdString(), Con::getIntArg(newBrake),Con::getIntArg(brakeType) );
       mDataBlock->onBrake_callback( this, newBrake, brakeType, mBrakeLevel );
    }
-
    //mBraking = move->trigger[mBrakeTrigger]; 
    mBraking = newBrake;
    // Set the tail brake light thread direction based on the brake state.
@@ -1875,17 +1873,21 @@ void WheeledVehicle::updateEngineForces(F32 dt)
    // Calculate Engine and brake torque values used later in
    // wheel calculations.
    F32 brakeVel;
+
    if( mBraking || mForceBraking ) {
-	   brakeVel = (mDataBlock->brakeTorque / aMomentum) * dt;      
+	   //brakeVel = (mDataBlock->brakeTorque / aMomentum) * dt;
+      //F32 wheelbrake = mBrakeLevel / mDataBlock->wheelCount;
+      //if(isServerObject()) Con::warnf("Brake Lvl:%f",mBrakeLevel);
+      brakeVel = (mBrakeLevel / aMomentum) * dt;
    } else {
 	   brakeVel = 0;
    }      
    if( inPark ) {
 	   brakeVel += ((2.0f*mDataBlock->brakeTorque)/aMomentum)*dt;      
-   }   
+   }
 
    // Scale engine rpm rolled in from last tick with current transmission settings.
-   F32 wRPM = applyTransmissionRatios(mEngineRPM);
+   //F32 wRPM = applyTransmissionRatios(mEngineRPM);
 
    // Integrate forces, we'll do this ourselves here instead of
    // relying on the rigid class which does it during movement.
@@ -1931,6 +1933,7 @@ void WheeledVehicle::updateEngineForces(F32 dt)
          continue;
 
       if (wheel->powered){
+            // Scale engine rpm rolled in from last tick with current transmission settings.
          wheel->rpm = applyTransmissionRatios(mEngineRPM);  // apply engine power
       } else {
          // If not powered, the wheel should only spin as fast as the vehicle
@@ -2114,7 +2117,7 @@ void WheeledVehicle::updateEngineForces(F32 dt)
             //mEngineRPM = mEngine->idleEngineRPM;
             // setGear(0);
          } else {
-            if(mThrottle!=0 ||  mCurGear == 1 || mCurGear == -1)
+            if( (mThrottle!=0 && !mBraking) ||  mCurGear == 1 || mCurGear == -1)
             {
                // This is the powered wheel velocity, if the wheels are already going 
                // faster, don't slow them down
@@ -2159,20 +2162,16 @@ void WheeledVehicle::updateEngineForces(F32 dt)
       // At this stage, the rigid body has been updated with last tick's forces and should
       // roughly match the wheel RPM until that value is updated.
 
-      // Calculate the wheel RPM going into the next tick.
+      // Calculate the new wheel RPM based on velocity change
       //wheel->rpm = rpmFromVel(wheel->avel, wheel->tire->circumference); // Do we want to defer this until next tick?
-      /*
       if (wheel->powered){
          wheel->rpm = rpmFromVel(wheel->avel, wheel->tire->circumference);
       } else {        
          wheel->rpm = rpmFromVel(getVelocity().len(), wheel->tire->circumference);  
-      }*/
-      F32 newRpm;
-      newRpm = rpmFromVel(wheel->avel, wheel->tire->circumference);
+      }
 
-      // Store values from fastest powered wheel and use next tick to calculate RPM drop
-      // on shift and engine slowdown. Wheel rpm is set next tick based on engine output.
-      if(wheel->powered && newRpm > mWheelRPM) {
+      // Use value from fastest powered wheel for engine calculations.
+      if(wheel->powered && wheel->rpm > mWheelRPM) {
          mWheelVel = wheel->avel;
          mWheelRPM = wheel->rpm;
       }
@@ -2186,10 +2185,12 @@ void WheeledVehicle::updateEngineForces(F32 dt)
    {
       fT = true;
    }
-   
+
    F32 neRPM = mWheelRPM * gearRatio() * mEngine->differentalRatio;  // Calculated new engine RPM
-   if ((!fT && mContPowered && mWheelRPM > 0 && !mCurGear == 0) || neRPM > mEngine->maxEngineRPM ){
-      mEngineRPM = neRPM;
+   if ((!fT && mContPowered && mWheelRPM > 0 && !mCurGear == 0) || neRPM > mEngine->maxEngineRPM || mBraking){
+      // Adjust the engine RPM based on updated forces. This rolls into
+      // the next processMove() where throttle inputs will be applied.
+      mEngineRPM = neRPM; 
    }
 
    // Jet Force
@@ -2210,7 +2211,8 @@ void WheeledVehicle::updateEngineForces(F32 dt)
       mRigid.atRest = false;
 
    // Gravity
-   mRigid.force += Point3F(0, 0, (sWheeledVehicleGravity * mRigid.mass) + (sWheeledVehicleGravity * mGravityAccum * mRigid.mass * mDataBlock->freefallGravity) );
+   F32 tgrava = mGravityAccum > 3 ? 3 : mGravityAccum;   // If we're falling for more than 3 seconds, that's enough.
+   mRigid.force += Point3F(0, 0, (sWheeledVehicleGravity * mRigid.mass) + (sWheeledVehicleGravity * tgrava * mRigid.mass * mDataBlock->freefallGravity) );
 
    // Integrate and update velocity
    mRigid.linMomentum += mRigid.force * dt;
@@ -2720,15 +2722,12 @@ U32 WheeledVehicle::packUpdate(NetConnection *con, U32 mask, BitStream *stream)
 
    // *Engine Change
   if( stream->writeFlag( mask & EngineMask ) ) {
-	  U32 engineid = 0;
 	  if(mEngine){
 		  stream->writeFlag(true);
 		  stream->writeRangedU32( mEngine->getId(), DataBlockObjectIdFirst, DataBlockObjectIdLast );
 	  } else {
 		  stream->writeFlag(false);
 	  }
-	  //stream->writeRangedU32( mEngine->getId(), DataBlockObjectIdFirst, DataBlockObjectIdLast );
-	  //stream->writeRangedU32( engineid, DataBlockObjectIdFirst, DataBlockObjectIdLast );
    }
    // *End Engine Change
 

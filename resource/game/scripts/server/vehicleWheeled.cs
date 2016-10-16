@@ -71,7 +71,7 @@ function WheeledVehicle::onBrake(%this, %type){
 function WheeledVehicleData::onCollision(%this, %obj, %col, %vec, %speed)
 {
    // Collision with other objects, including items
-   warn("Collision:"@%obj@" was hit by "@%col@" @ "@%speed@" from "@%vec);
+   //warn("Collision:"@%obj@" was hit by "@%col@" @ "@%speed@" from "@%vec);
 }
 
 // We have hit something
@@ -84,8 +84,8 @@ function WheeledVehicleData::onImpact(%this, %obj, %col, %vec, %speed)
 
 
 function WheeledVehicleEngine::onShift(%this, %obj, %gear, %rpm){
-	echo("(engine)Shifted to:" @ %gear SPC "RPM:" @ %rpm);
-	echo("%obj:" SPC %obj SPC %obj.cli);
+	//echo("(engine)Shifted to:" @ %gear SPC "RPM:" @ %rpm);
+	//echo("%obj:" SPC %obj SPC %obj.cli);
 	commandToClient(%obj.getControllingClient(), 'updateGearDisplay', %gear);	// Tell the client to update their screen score.
 }
 
@@ -189,15 +189,15 @@ function serverCmdUpShift(%client)
    echo(">"@%p);
    if (%p.isMounted == true){
       %o = %p.mVehicle;      
-      echo("o:" @ %o SPC "Gear:" @ %o.getGear() SPC "RPM:" @ %o.rpm SPC "Speed:" @ %o.getSpeed());      
+      //echo("o:" @ %o SPC "Gear:" @ %o.getGear() SPC "RPM:" @ %o.rpm SPC "Speed:" @ %o.getSpeed());      
    }
-   error("UPSHIFT Command");
+   //error("UPSHIFT Command");
    upshiftVehicle(%client.player);   
    
 }
 function serverCmdDnShift(%client)
 {
-   error("Downshift Command");
+   //error("Downshift Command");
    downshiftVehicle(%client.player);
 }
 

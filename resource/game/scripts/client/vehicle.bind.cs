@@ -14,6 +14,11 @@
 $pref::vehicle::brakeTrigger = 4;
 
 
+if (isJoystickDetected()){
+   //exec("./joystick.cs");
+   enableJoystick();
+}
+
 if ( isObject( vehicleDriverMap ) )
    vehicleDriverMap.delete();
 new ActionMap(vehicleDriverMap);
@@ -143,12 +148,14 @@ vehicleMap.bind(joystick0, "xaxis", gamepadYaw);
 vehicleMap.bind(joystick0, "button1", accelerate);
 vehicleMap.bind(joystick0, "button0", decelerate);
 vehicleMap.bind(joystick0, "button2", brake);
+vehicleMap.bind(joystick0, "button2", headLights);
 vehicleMap.bindCmd(joystick0, "button7", "commandToServer(\'DismountVehicle\');", "");
 //vehicleDriverMap.bind(joystick0, "button4",  "commandToServer(\'dnShift\');");
 //vehicleDriverMap.bind(joystick0, "button5",  "commandToServer(\'upShift\');");
 vehicleMap.bindCmd(joystick0, "button4", "commandToServer('DnShift');", "");
 vehicleMap.bindCmd(joystick0, "button5", "commandToServer('UpShift');", "");
 vehicleMap.bindCmd(joystick0, "button6", "commandToServer('carHop');", "");
+
 
 vehicleMap.bind(keyboard, tab, toggleFirstPerson );
 

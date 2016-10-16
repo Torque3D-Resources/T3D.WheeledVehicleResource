@@ -177,7 +177,8 @@ function loadEngineGui(%vehicle, %engine, %tire, %spring)
 	C_BodyRestitution.setText(%vehicle.bodyRestitution);
    C_MassBox.setText(%vehicle.massBox);
    
-   
+   C_BrakeRate.setText(%vehicle.brakeRate);
+   C_BrakeIncrease.setText(%vehicle.brakeIncrease);
    
    C_SteeringReturn.setText(%vehicle.steeringReturn);
 	C_SteeringReturnSpeedScale.setText(%vehicle.steeringReturnSpeedScale);
@@ -241,6 +242,9 @@ function saveEngineGuiData(%vehicle, %engine, %tire, %spring)
 
 	%vehicle.DustVolume = C_DustVolume.getText();
 	%vehicle.brakeTorque = C_BrakeTorque.getText();
+	%vehicle.brakeRate = C_BrakeRate.getText();
+	%vehicle.brakeIncrease = C_BrakeIncrease.getText();
+	
 	%vehicle.maxSteeringAngle = C_MaxSteer.getText();
 	%vehicle.mass = C_Mass.getText();
 	%vehicle.massCenter = C_MassCenter.getText();
@@ -326,6 +330,9 @@ function vehicleEditGui::clearFields(%this){
 	//C_SteerBoostSpeed.setText("");
 	//C_SteerBoostAngle.setText("");
 	C_BrakeTorque.setText("");
+	C_BrakeRate.setText("");
+	C_BrakeIncrease.setText("");
+	
 	C_MaxSteer.setText("");
 	C_Mass.setText("");
 	C_MassCenter.setText("");

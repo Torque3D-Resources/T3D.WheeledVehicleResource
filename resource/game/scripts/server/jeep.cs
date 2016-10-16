@@ -26,7 +26,7 @@ function JeepCar::onAdd(%this, %obj)
 
 	// ** Add vehicle-specific engine here
 	%obj.setEngine( JeepEngine );   
-    %obj.fuelFlow = .2;
+    %obj.fuelFlow = .3;
     %obj.hop = 3000;
 
    %obj.setWheelTire(0,JeepCarTire);
