@@ -472,3 +472,53 @@ function serverCmdFindNextFreeSeat(%client)
       echo("No next free seat");
    }
 }
+
+
+// *******************************************
+// Function: onMountVehicle
+//
+// Inputs: VehicleData - datablock of mount vehicle
+//         Player - Player object that will be mounted.
+//         Vehicle - Vehicle object player will be mounted to.
+//
+// Outputs: None
+//
+// This function initiates the mount process.
+// It locates an empty seat in the vehicle and
+// calls the function to perform the mount.
+// *******************************************
+function onMountVehicle(%vehicleData, %player, %vehicle)
+{
+   // Is the vehicle currently mountable?
+   if (%vehicle.mountable == false)
+   {
+      echo("Sorry, the vehicle is not mountable.");
+      return;
+   }
+   // Check the speed of the vehicle. If it's moving, we can't mount it.
+   // Note there is a threshold that determines if the vehicle is moving.
+   %vel = %vehicle.getVelocity();
+   %speed = vectorLen(%vel);
+   if ( %speed <= %vehicleData.maxMountSpeed )
+   {
+      // Find an empty seat
+      %seat = %vehicleData.findEmptySeat(%vehicle, %vehicleData);
+      if(%seat==-1)
+      {
+         echo("No empty seats found.");
+         return;
+      }
+      %player.mVehicle = %vehicle;
+      %player.mSeat = %seat;
+      %player.isMounted = true;
+
+      echo("Mounting vehicle in seat " @ %seat);
+
+      // Now mount the vehicle.
+      %vehicle.mountObject(%player,%seat);
+   }
+   else
+   {
+      echo("You cannot mount a moving vehicle.");
+   }
+}

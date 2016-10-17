@@ -1422,7 +1422,9 @@ void WheeledVehicle::updateMove(const Move* move)
       }
 	}
    // Brake on trigger - go full-on; consider emergency brake;
-   S32 brakeType = 0;
+   S32 brakeType = 0;   
+   bool newBrake;
+   newBrake = false;
    if(brake){
       brakeType = 1; // Regular brake
       if(mBrakeLevel < mDataBlock->brakeTorque){
@@ -1919,7 +1921,7 @@ void WheeledVehicle::updateEngineForces(F32 dt)
    if (contactCount)
       verticalLoad /= contactCount;
 
-   if (contactCount > 2){
+   if (contactCount > 3){
       mGravityAccum = 0;  // Wheels have contact, so we aren't in freefall.
    } else {
       mGravityAccum += dt; // If no wheels have contact, accumulate the time to apply to gravity.

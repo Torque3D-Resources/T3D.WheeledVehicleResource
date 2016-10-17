@@ -62,7 +62,8 @@ function PlayerData::onMount(%this, %obj, %vehicle, %node)
       %obj.unmountImage($WeaponSlot);
 
       %obj.setControlObject(%vehicle);
-      
+      %vehicle.cli = %obj.client;
+
       if(%obj.getClassName() $= "Player")
          commandToClient(%obj.client, 'toggleVehicleMap', true);
    }
@@ -165,6 +166,7 @@ function PlayerData::onCollision(%this, %obj, %col)
    }
 
    // Mount vehicles
+   /*
    if (%col.getType() & $TypeMasks::GameBaseObjectType)
    {
       %db = %col.getDataBlock();
@@ -186,6 +188,7 @@ function PlayerData::onCollision(%this, %obj, %col)
          %obj.mVehicle = %col;
       }
    }
+   */
 }
 
 function PlayerData::onImpact(%this, %obj, %collidedObject, %vec, %vecLen)

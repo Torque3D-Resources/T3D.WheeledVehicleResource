@@ -658,5 +658,13 @@ GlobalActionMap.bindCmd(keyboard, "alt enter", "", "Canvas.attemptFullscreenTogg
 GlobalActionMap.bindCmd(keyboard, "F1", "", "contextHelp();");
 moveMap.bindCmd(keyboard, "n", "toggleNetGraph();", "");
 
+
+function useObject(%val)
+{
+   if (%val)
+      commandToServer('UseObject');
+}
+moveMap.bind(keyboard, "f", useObject);
+
 // Include vehicle mapping/commands.
 exec("./vehicle.bind.cs");
