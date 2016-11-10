@@ -11,21 +11,22 @@
      <li>emit bubbles when any active damage emitter point is underwater</li>
    </ul>
    <code>
-   // damage from collisions<br>
-   collDamageMultiplier = 0.05;<br>
-   collDamageThresholdVel = 15;<br>
+   // damage from collisions
+   collDamageMultiplier = 0.05;
+   collDamageThresholdVel = 15;
 
-   // damage levels<br>
-   damageLevelTolerance[0] = 0.5;<br>
-   damageEmitter[0] = GraySmokeEmitter;     // emitter used when damage is >= 50%<br>
-   damageLevelTolerance[1] = 0.85;<br>
-   damageEmitter[1] = BlackSmokeEmitter;    // emitter used when damage is >= 85%<br>
-   damageEmitter[2] = DamageBubbleEmitter;  // emitter used instead of damageEmitter[0:1]<br>
-                                            // when offset point is underwater<br>
-   // emit offsets (used for all active damage level emitters)<br>
-   damageEmitterOffset[0] = \"0.5 3 1\";<br>
-   damageEmitterOffset[1] = \"-0.5 3 1\";<br>
-   numDmgEmitterAreas = 2;<br>
+   // damage levels
+   damageLevelTolerance[0] = 0.5;
+   damageEmitter[0] = GraySmokeEmitter;     // emitter used when damage is >= 50%
+   damageLevelTolerance[1] = 0.85;
+   damageEmitter[1] = BlackSmokeEmitter;    // emitter used when damage is >= 85%
+   damageEmitter[2] = DamageBubbleEmitter;  // emitter used instead of damageEmitter[0:1]
+                                            // when offset point is underwater
+
+   // emit offsets (used for all active damage level emitters)
+   damageEmitterOffset[0] = \"0.5 3 1\";
+   damageEmitterOffset[1] = \"-0.5 3 1\";
+   numDmgEmitterAreas = 2;
    </code>
 
 <h3>VehicleData console fields</h3>
