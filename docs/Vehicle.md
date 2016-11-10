@@ -5,29 +5,30 @@
 
    <div>The example below shows how to setup a Vehicle to:</div>"
    <ul>
-     <li>take damage when colliding with another object\n"
-     <li>emit gray smoke particles from two locations on the Vehicle when damaged above 50%</li>"
-     <li>emit black smoke particles from two locations on the Vehicle when damaged above 85%</li>"
-     <li>emit bubbles when any active damage emitter point is underwater</li>"
-   </ul>"
+     <li>take damage when colliding with another object</li>
+     <li>emit gray smoke particles from two locations on the Vehicle when damaged above 50%</li>
+     <li>emit black smoke particles from two locations on the Vehicle when damaged above 85%</li>
+     <li>emit bubbles when any active damage emitter point is underwater</li>
+   </ul>
    <code>
-   // damage from collisions
-   collDamageMultiplier = 0.05;
-   collDamageThresholdVel = 15;
+   // damage from collisions<br>
+   collDamageMultiplier = 0.05;<br>
+   collDamageThresholdVel = 15;<br>
 
-   // damage levels
-   damageLevelTolerance[0] = 0.5;\n"
-   damageEmitter[0] = GraySmokeEmitter;     // emitter used when damage is >= 50%\n"
-   damageLevelTolerance[1] = 0.85;\n"
-   damageEmitter[1] = BlackSmokeEmitter;    // emitter used when damage is >= 85%\n"
-   damageEmitter[2] = DamageBubbleEmitter;  // emitter used instead of damageEmitter[0:1]\n"
-                                            // when offset point is underwater\n"
-   // emit offsets (used for all active damage level emitters)\n"
-   damageEmitterOffset[0] = \"0.5 3 1\";\n"
-   damageEmitterOffset[1] = \"-0.5 3 1\";\n"
-   numDmgEmitterAreas = 2;\n"
+   // damage levels<br>
+   damageLevelTolerance[0] = 0.5;<br>
+   damageEmitter[0] = GraySmokeEmitter;     // emitter used when damage is >= 50%<br>
+   damageLevelTolerance[1] = 0.85;<br>
+   damageEmitter[1] = BlackSmokeEmitter;    // emitter used when damage is >= 85%<br>
+   damageEmitter[2] = DamageBubbleEmitter;  // emitter used instead of damageEmitter[0:1]<br>
+                                            // when offset point is underwater<br>
+   // emit offsets (used for all active damage level emitters)<br>
+   damageEmitterOffset[0] = \"0.5 3 1\";<br>
+   damageEmitterOffset[1] = \"-0.5 3 1\";<br>
+   numDmgEmitterAreas = 2;<br>
    </code>
 
+<h3>VehicleData console fields</h3>
 
 <table>
 <tr>
