@@ -10,7 +10,8 @@
      <li>emit black smoke particles from two locations on the Vehicle when damaged above 85%</li>
      <li>emit bubbles when any active damage emitter point is underwater</li>
    </ul>
-   <code>
+
+   <pre>
    // damage from collisions
    collDamageMultiplier = 0.05;
    collDamageThresholdVel = 15;
@@ -27,7 +28,7 @@
    damageEmitterOffset[0] = \"0.5 3 1\";
    damageEmitterOffset[1] = \"-0.5 3 1\";
    numDmgEmitterAreas = 2;
-   </code>
+   </pre>
 
 <h3>VehicleData console fields</h3>
 
