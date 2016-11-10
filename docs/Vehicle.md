@@ -1,81 +1,132 @@
-"The VehicleData class extends the basic energy/damage functionality provided "
-   "by ShapeBaseData to include damage from collisions, as well as particle "
-   "emitters activated automatically when damage levels reach user specified "
-   "thresholds.\n\n"
+<P>The VehicleData class extends the basic energy/damage functionality provided "
+   by ShapeBaseData to include damage from collisions, as well as particle "
+   emitters activated automatically when damage levels reach user specified "
+   thresholds.</P>
 
-   "The example below shows how to setup a Vehicle to:\n"
-   "<ul>\n"
-   "  <li>take damage when colliding with another object\n"
-   "  <li>emit gray smoke particles from two locations on the Vehicle when damaged above 50%</li>\n"
-   "  <li>emit black smoke particles from two locations on the Vehicle when damaged above 85%</li>\n"
-   "  <li>emit bubbles when any active damage emitter point is underwater</li>\n"
-   "</ul>\n\n"
+   <div>The example below shows how to setup a Vehicle to:</div>"
+   <ul>
+     <li>take damage when colliding with another object\n"
+     <li>emit gray smoke particles from two locations on the Vehicle when damaged above 50%</li>"
+     <li>emit black smoke particles from two locations on the Vehicle when damaged above 85%</li>"
+     <li>emit bubbles when any active damage emitter point is underwater</li>"
+   </ul>"
+   <code>
+   // damage from collisions
+   collDamageMultiplier = 0.05;
+   collDamageThresholdVel = 15;
 
-   "@tsexample\n"
-   "// damage from collisions\n"
-   "collDamageMultiplier = 0.05;\n"
-   "collDamageThresholdVel = 15;\n\n"
-
-   "// damage levels\n"
-   "damageLevelTolerance[0] = 0.5;\n"
-   "damageEmitter[0] = GraySmokeEmitter;     // emitter used when damage is >= 50%\n"
-   "damageLevelTolerance[1] = 0.85;\n"
-   "damageEmitter[1] = BlackSmokeEmitter;    // emitter used when damage is >= 85%\n"
-   "damageEmitter[2] = DamageBubbleEmitter;  // emitter used instead of damageEmitter[0:1]\n"
-   "                                         // when offset point is underwater\n"
-   "// emit offsets (used for all active damage level emitters)\n"
-   "damageEmitterOffset[0] = \"0.5 3 1\";\n"
-   "damageEmitterOffset[1] = \"-0.5 3 1\";\n"
-   "numDmgEmitterAreas = 2;\n"
-   "@endtsexample\n"
-
+   // damage levels
+   damageLevelTolerance[0] = 0.5;\n"
+   damageEmitter[0] = GraySmokeEmitter;     // emitter used when damage is >= 50%\n"
+   damageLevelTolerance[1] = 0.85;\n"
+   damageEmitter[1] = BlackSmokeEmitter;    // emitter used when damage is >= 85%\n"
+   damageEmitter[2] = DamageBubbleEmitter;  // emitter used instead of damageEmitter[0:1]\n"
+                                            // when offset point is underwater\n"
+   // emit offsets (used for all active damage level emitters)\n"
+   damageEmitterOffset[0] = \"0.5 3 1\";\n"
+   damageEmitterOffset[1] = \"-0.5 3 1\";\n"
+   numDmgEmitterAreas = 2;\n"
+   </code>
 
 
-   addField( "jetForce", TypeF32, Offset(jetForce, VehicleData),
-      "@brief Additional force applied to the vehicle when it is jetting.\n\n"
-      "For WheeledVehicles, the force is applied in the forward direction. For "
-      "FlyingVehicles, the force is applied in the thrust direction." );
-   addField( "jetEnergyDrain", TypeF32, Offset(jetEnergyDrain, VehicleData),
-      "@brief Energy amount to drain for each tick the vehicle is jetting.\n\n"
-      "Once the vehicle's energy level reaches 0, it will no longer be able to jet." );
-   addField( "minJetEnergy", TypeF32, Offset(minJetEnergy, VehicleData),
-      "Minimum vehicle energy level to begin jetting." );
+<table>
+<tr>
+	<td>jetForce</td>
+	<td>F32</td>
+	<td>Additional force applied to the vehicle when it is jetting.<br>
+      For WheeledVehicles, the force is applied in the forward direction. For
+      FlyingVehicles, the force is applied in the thrust direction.</td>
+</tr>
+<tr>
+	<td>jetEnergyDrain</td>
+	<td>F32</td>
+	<td>Energy amount to drain for each tick the vehicle is jetting.<br>
+      Once the vehicle's energy level reaches 0, it will no longer be able to jet.</td>
+</tr>
+<tr>
+	<td>minJetEnergy</td>
+	<td>F32</td>
+	<td>Minimum vehicle energy level to begin jetting.</td>
+</tr>
+<tr>
+	<td>steeringReturn</td>
+	<td>F32</td>
+	<td>Rate at which the vehicle's steering returns to forwards when it is moving.</td>
+</tr>
+<tr>
+	<td>steeringReturnSpeedScale</td>
+	<td>F32</td>
+	<td>Amount of effect the vehicle's speed has on its rate of steering return.</td>
+</tr>
+<tr>
+	<td>powerSteering</td>
+	<td>bool</td>
+	<td>If true, steering does not auto-centre while the vehicle is being steered by its driver.</td>
+</tr>
+<tr>
+	<td>massCenter</td>
+	<td>Point3F</td>
+	<td>Defines the vehicle's center of mass (offset from the origin of the model).</td>
+</tr>
+<tr>
+	<td>massBox</td>
+	<td>Point3F</td>
+	<td>Define the box used to estimate the vehicle's moment of inertia.<br>
+      Currently only used by WheeledVehicle; other vehicle types use a unit sphere to compute inertia.
+	</td>
+</tr>
+<tr>
+	<td>massCenter</td>
+	<td>Point3F</td>
+	<td>Defines the vehicle's center of mass (offset from the origin of the model).</td>
+</tr>
+  <tr>
+    <td>bodyRestitution</td>
+    <td>F32</td>
+    <td>Collision 'bounciness'.<br>Normally in the range 0 (not bouncy at all) to 1 (100% bounciness).</td>
+  </tr>
+  <tr>
+    <td>bodyFriction</td>
+    <td>F32</td>
+    <td>Collision friction coefficient.<br>How well this object will slide against objects it collides with.</td>
+  </tr>
+  <tr>
+    <td>softImpactSound</td>
+    <td>SFXProfile</td>
+    <td>Sound to play on a 'soft' impact.<br>
+      This sound is played if the impact speed is < hardImpactSpeed and >= softImpactSpeed.
+    </td>
+  </tr>
+  <tr>
+    <td>hardImpactSound</td>
+    <td>SFXProfile</td>
+    <td>Sound to play on a 'hard' impact.<br>
+      This sound is played if the impact speed is >= hardImpactSpeed.
+    </td>
+  </tr>
+  <tr>
+    <td>minImpactSpeed</td>
+    <td>F32</td>
+    <td>Minimum collision speed for the onImpact callback to be invoked.</td>
+  </tr>
+  <tr>
+    <td>minImpactSpeed</td>
+    <td>F32</td>
+    <td>Minimum collision speed for the onImpact callback to be invoked.</td>
+  </tr>
+  <tr>
+    <td>softImpactSpeed</td>
+    <td>F32</td>
+    <td>Minimum collision speed for the softImpactSound to be played.</td>
+  </tr>
+  <tr>
+    <td>hardImpactSpeed</td>
+    <td>F32</td>
+    <td>Minimum collision speed for the hardImpactSound to be played.</td>
+  </tr>
+</table>
 
-   addField( "steeringReturn", TypeF32, Offset(steeringReturn, VehicleData),
-      "Rate at which the vehicle's steering returns to forwards when it is moving." );
-   addField( "steeringReturnSpeedScale", TypeF32, Offset(steeringReturnSpeedScale, VehicleData),
-      "Amount of effect the vehicle's speed has on its rate of steering return." );
-   addField( "powerSteering", TypeBool, Offset(powerSteering, VehicleData),
-      "If true, steering does not auto-centre while the vehicle is being steered by its driver." );
-
-   addField( "massCenter", TypePoint3F, Offset(massCenter, VehicleData),
-      "Defines the vehicle's center of mass (offset from the origin of the model)." );
-   addField( "massBox", TypePoint3F, Offset(massBox, VehicleData),
-      "@brief Define the box used to estimate the vehicle's moment of inertia.\n\n"
-      "Currently only used by WheeledVehicle; other vehicle types use a "
-      "unit sphere to compute inertia." );
-   addField( "bodyRestitution", TypeF32, Offset(body.restitution, VehicleData),
-      "Collision 'bounciness'.\nNormally in the range 0 (not bouncy at all) to "
-      "1 (100% bounciness)." );
-   addField( "bodyFriction", TypeF32, Offset(body.friction, VehicleData),
-      "Collision friction coefficient.\nHow well this object will slide against "
-      "objects it collides with." );
-   addField( "softImpactSound", TYPEID< SFXProfile >(), Offset(body.sound[Body::SoftImpactSound], VehicleData),
-      "@brief Sound to play on a 'soft' impact.\n\n"
-      "This sound is played if the impact speed is < hardImpactSpeed and >= "
-      "softImpactSpeed.\n\n"
-      "@see softImpactSpeed" );
-   addField( "hardImpactSound", TYPEID< SFXProfile >(), Offset(body.sound[Body::HardImpactSound], VehicleData),
-      "@brief Sound to play on a 'hard' impact.\n\n"
-      "This sound is played if the impact speed >= hardImpactSpeed.\n\n"
-      "@see hardImpactSpeed" );
-
-   addField( "minImpactSpeed", TypeF32, Offset(minImpactSpeed, VehicleData),
-      "Minimum collision speed for the onImpact callback to be invoked." );
-   addField( "softImpactSpeed", TypeF32, Offset(softImpactSpeed, VehicleData),
-      "Minimum collision speed for the softImpactSound to be played." );
-   addField( "hardImpactSpeed", TypeF32, Offset(hardImpactSpeed, VehicleData),
-      "Minimum collision speed for the hardImpactSound to be played." );
+<pre>
    addField( "minRollSpeed", TypeF32, Offset(minRollSpeed, VehicleData),
       "Unused" );
    addField( "maxSteeringAngle", TypeF32, Offset(maxSteeringAngle, VehicleData),
@@ -185,25 +236,37 @@
       "velocity).\n\nCurrently unused." );
 
 
-
+</pre>
 
 <h3>VehicleDatablock Callbacks:</h3>
-onEnterLiquid() - Vehicle
-onLeaveLiquid() - Vehicle
+<div>onEnterLiquid()</div>
+<div>onLeaveLiquid()</div>
 
 
-Vehicle Console Variables:
-$vehicle::workingQueryBoxStaleThreshold, S32, The maximum number of ticks that go by before the mWorkingQueryBox is considered stale and needs updating.\n\n"
-      "Other factors can cause the collision working query box to become invalidated, such as the vehicle moving far "
-      "enough outside of this cached box.  The smaller this number, the more times the working list of triangles that are "
-      "considered for collision is refreshed.  This has the greatest impact with colliding with high triangle count meshes.\n\n"
-      "@note Set to -1 to disable any time-based forced check.
+<h3>Vehicle Console Variables:</h3>
+<table>
+<tr>
+	<td>$vehicle::workingQueryBoxStaleThreshold</td>
+	<td>S32</td>
+	<td>The maximum number of ticks that go by before the mWorkingQueryBox is considered stale and needs updating.<br><br>"
+      Other factors can cause the collision working query box to become invalidated, such as the vehicle moving far
+      enough outside of this cached box.  The smaller this number, the more times the working list of triangles that are
+      considered for collision is refreshed.  This has the greatest impact with colliding with high triangle count meshes.<br>
+      @note Set to -1 to disable any time-based forced check.
+	</td>
+</tr>
+<tr>
+	<td>$vehicle::workingQueryBoxSizeMultiplier</td>
+	<td>F32</td>
+	<td>How much larger the mWorkingQueryBox should be made when updating the working collision list.<br>
+      The larger this number the less often the working list will be updated due to motion, but any non-static shape that
+      moves into the query box will not be noticed.
+	</td>
+</tr>
+</table>
 
-$vehicle::workingQueryBoxSizeMultiplier",TypeF32,How much larger the mWorkingQueryBox should be made when updating the working collision list.\n\n"
-      "The larger this number the less often the working list will be updated due to motion, but any non-static shape that "
-      "moves into the query box will not be noticed.\n\n"
-
-Vehicle Persistant Fields:
+<h3>Vehicle Persistant Fields:</h3>
 disableMove bool When this flag is set, the vehicle will ignore throttle changes.
-Vehicle Callbacks:
+
+<h3>Vehicle Callbacks:</h3>
 onCollision(%this, %object, %vector, %magnitude);

@@ -24,6 +24,20 @@
     <td>Tire friction when the wheel is not slipping (has traction).</td>
   </tr>
   <tr>
+    <td>softImpactSound</td>
+    <td>SFXProfile</td>
+    <td>Sound to play on a 'soft' impact.<br>
+      This sound is played if the impact speed is < hardImpactSpeed and >= softImpactSpeed.
+    </td>
+  </tr>
+  <tr>
+    <td>hardImpactSound</td>
+    <td>SFXProfile</td>
+    <td>Sound to play on a 'hard' impact.<br>
+      This sound is played if the impact speed is >= hardImpactSpeed.
+    </td>
+  </tr>
+  <tr>
     <td>TireEmitter</td>
     <td>ParticleEmitterData</td>
     <td>Datablock used to generate particles from each wheel when the vehicle is moving and the wheel is in contact with the ground."</td>
