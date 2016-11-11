@@ -1,7 +1,7 @@
-<P>The VehicleData class extends the basic energy/damage functionality provided "
-   by ShapeBaseData to include damage from collisions, as well as particle "
-   emitters activated automatically when damage levels reach user specified "
-   thresholds.</P>
+<p>The VehicleData class extends the basic energy/damage functionality provided
+   by ShapeBaseData to include damage from collisions, as well as particle
+   emitters activated automatically when damage levels reach user specified
+   thresholds.</p>
 
    <div>The example below shows how to setup a Vehicle to:</div>"
    <ul>
@@ -127,39 +127,114 @@
     <td>F32</td>
     <td>Minimum collision speed for the hardImpactSound to be played.</td>
   </tr>
+  <tr>
+    <td>maxSteeringAngle</td>
+    <td>F32</td>
+    <td>Maximum yaw (horizontal) and pitch (vertical) steering angle in radians.</td>
+  </tr>
+  <tr>
+    <td>maxDrag</td>
+    <td>F32</td>
+    <td>Maximum drag coefficient.<br>Currently unused.</td>
+  </tr>
+  <tr>
+    <td>minDrag</td>
+    <td>F32</td>
+    <td>Minimum drag coefficient.<br>Currently only used by FlyingVehicle.</td>
+  </tr>
+  <tr>
+    <td>integration</td>
+    <td>S32</td>
+    <td>Number of integration steps per tick.<br>
+	Increase this to improve simulationstability (also increases simulation processing time)
+    </td>
+  </tr>
+  <tr>
+    <td>collisionTol</td>
+    <td>F32</td>
+    <td>Minimum distance between objects for them to be considered as colliding.</td>
+  </tr>
+  <tr>
+    <td>contactTol</td>
+    <td>F32</td>
+    <td>Maximum relative velocity between objects for collisions to be resolved as contacts.<br>
+	Velocities greater than this are handled as collisions.
+    </td>
+  </tr>
+  <tr>
+    <td>collDamageThresholdVel</td>
+    <td>F32</td>
+    <td>Minimum collision velocity to cause damage to this vehicle.<br>Currently unused.</td>
+  </tr>
+  <tr>
+    <td>CollDamageMultiplier</td>
+    <td>F32</td>
+    <td>Damage to this vehicle after a collision (multiplied by collision velocity).<br>Currently unused.</td>
+  </tr>
+
+
+  <tr>
+    <td>cameraRoll</td>
+    <td>bool</td>
+    <td>If true, the camera will roll with the vehicle. If false, the camera will always have the positive Z axis as up.</td>
+  </tr>
+  <tr>
+    <td>cameraLag</td>
+    <td>F32</td>
+    <td>How much the camera lags behind the vehicle depending on vehicle speed.<br><br>
+      Increasing this value will make the camera fall further behind the vehicle as it accelerates away.</td>
+  </tr>
+  <tr>
+    <td>cameraDecay</td>
+    <td>F32</td>
+    <td>How quickly the camera moves back towards the vehicle when stopped.</td>
+  </tr>
+  <tr>
+    <td>cameraOffset</td>
+    <td>F32</td>
+    <td>Vertical (Z axis) height of the camera above the vehicle.</td>
+  </tr>
+  <tr>
+    <td>damageEmitter[]</td>
+    <td>ParticleEmitterData</td>
+    <td>Array of particle emitters used to generate damage (dust, smoke etc) effects.<br><br>
+      Currently, the first two emitters (indices 0 and 1) are used when the damage
+      level exceeds the associated damageLevelTolerance. The 3rd emitter is used
+      when the emitter point is underwater.</td>
+  </tr>
+  <tr>
+    <td>damageLevelTolerance</td>
+    <td>F32</td>
+    <td>Damage levels (as a percentage of maxDamage) above which to begin emitting particles from the associated damageEmitter.<br><br>
+      Levels should be in order of increasing damage.</td>
+  </tr>
+  <tr>
+    <td>numDmgEmitterAreas</td>
+    <td>S32</td>
+    <td>Number of damageEmitterOffset values to use for each damageEmitter.</td>
+  </tr>
+  <tr>
+    <td>damageEmitterOffset[]</td>
+    <td>Point3F</td>
+    <td>Object space \"x y z\" offsets used to emit particles for the active damageEmitter.<br><br>
+	Example:
+	<pre>
+      // damage levels
+      damageLevelTolerance[0] = 0.5;
+      damageEmitter[0] = SmokeEmitter;
+      // emit offsets (used for all active damage level emitters)
+      damageEmitterOffset[0] = \"0.5 3 1\";
+      damageEmitterOffset[1] = \"-0.5 3 1\";
+      numDmgEmitterAreas = 2;
+	</pre>
+</td>
+  </tr>
 </table>
 
 <pre>
    addField( "minRollSpeed", TypeF32, Offset(minRollSpeed, VehicleData),
       "Unused" );
-   addField( "maxSteeringAngle", TypeF32, Offset(maxSteeringAngle, VehicleData),
-      "Maximum yaw (horizontal) and pitch (vertical) steering angle in radians." );
 
-   addField( "maxDrag", TypeF32, Offset(maxDrag, VehicleData),
-      "Maximum drag coefficient.\nCurrently unused." );
-   addField( "minDrag", TypeF32, Offset(minDrag, VehicleData),
-      "Minimum drag coefficient.\nCurrently only used by FlyingVehicle." );
-   addField( "integration", TypeS32, Offset(integration, VehicleData),
-      "Number of integration steps per tick.\nIncrease this to improve simulation "
-      "stability (also increases simulation processing time)." );
-   addField( "collisionTol", TypeF32, Offset(collisionTol, VehicleData),
-      "Minimum distance between objects for them to be considered as colliding." );
-   addField( "contactTol", TypeF32, Offset(contactTol, VehicleData),
-      "Maximum relative velocity between objects for collisions to be resolved "
-      "as contacts.\nVelocities greater than this are handled as collisions." );
-
-   addField( "cameraRoll", TypeBool, Offset(cameraRoll, VehicleData),
-      "If true, the camera will roll with the vehicle. If false, the camera will "
-      "always have the positive Z axis as up." );
-   addField( "cameraLag", TypeF32, Offset(cameraLag, VehicleData),
-      "@brief How much the camera lags behind the vehicle depending on vehicle speed.\n\n"
-      "Increasing this value will make the camera fall further behind the vehicle "
-      "as it accelerates away.\n\n@see cameraDecay." );
-   addField("cameraDecay",  TypeF32, Offset(cameraDecay, VehicleData),
-      "How quickly the camera moves back towards the vehicle when stopped.\n\n"
-      "@see cameraLag." );
-   addField("cameraOffset", TypeF32, Offset(cameraOffset, VehicleData),
-      "Vertical (Z axis) height of the camera above the vehicle." );
 
    addField( "dustEmitter", TYPEID< ParticleEmitterData >(), Offset(dustEmitter, VehicleData),
       "Dust particle emitter.\n\n@see triggerDustHeight\n\n@see dustHeight");
@@ -170,34 +245,6 @@
       "particles from the dustEmitter." );
    addField( "dustHeight", TypeF32, Offset(dustHeight, VehicleData),
       "Height above ground at which to emit particles from the dustEmitter." );
-
-   addField( "damageEmitter", TYPEID< ParticleEmitterData >(), Offset(damageEmitterList, VehicleData), VC_NUM_DAMAGE_EMITTERS,
-      "@brief Array of particle emitters used to generate damage (dust, smoke etc) "
-      "effects.\n\n"
-      "Currently, the first two emitters (indices 0 and 1) are used when the damage "
-      "level exceeds the associated damageLevelTolerance. The 3rd emitter is used "
-      "when the emitter point is underwater.\n\n"
-      "@see damageEmitterOffset" );
-   addField( "damageEmitterOffset", TypePoint3F, Offset(damageEmitterOffset, VehicleData), VC_NUM_DAMAGE_EMITTER_AREAS,
-      "@brief Object space \"x y z\" offsets used to emit particles for the "
-      "active damageEmitter.\n\n"
-      "@tsexample\n"
-      "// damage levels\n"
-      "damageLevelTolerance[0] = 0.5;\n"
-      "damageEmitter[0] = SmokeEmitter;\n"
-      "// emit offsets (used for all active damage level emitters)\n"
-      "damageEmitterOffset[0] = \"0.5 3 1\";\n"
-      "damageEmitterOffset[1] = \"-0.5 3 1\";\n"
-      "numDmgEmitterAreas = 2;\n"
-      "@endtsexample\n" );
-   addField( "damageLevelTolerance", TypeF32, Offset(damageLevelTolerance, VehicleData), VC_NUM_DAMAGE_LEVELS,
-      "@brief Damage levels (as a percentage of maxDamage) above which to begin "
-      "emitting particles from the associated damageEmitter.\n\n"
-      "Levels should be in order of increasing damage.\n\n"
-      "@see damageEmitterOffset" );
-   addField( "numDmgEmitterAreas", TypeF32, Offset(numDmgEmitterAreas, VehicleData),
-      "Number of damageEmitterOffset values to use for each damageEmitter.\n\n"
-      "@see damageEmitterOffset" );
 
    addField( "splashEmitter", TYPEID< ParticleEmitterData >(), Offset(splashEmitterList, VehicleData), VC_NUM_SPLASH_EMITTERS,
       "Array of particle emitters used to generate splash effects." );
@@ -231,13 +278,6 @@
       "Sound to play when entering the water with speed >= hardSplashSoundVelocity." );
    addField( "waterWakeSound", TYPEID< SFXProfile >(), Offset(waterSound[Wake], VehicleData),
       "Looping sound to play while moving through the water." );
-
-   addField( "collDamageThresholdVel", TypeF32, Offset(collDamageThresholdVel, VehicleData),
-      "Minimum collision velocity to cause damage to this vehicle.\nCurrently unused." );
-   addField( "collDamageMultiplier", TypeF32, Offset(collDamageMultiplier, VehicleData),
-      "@brief Damage to this vehicle after a collision (multiplied by collision "
-      "velocity).\n\nCurrently unused." );
-
 
 </pre>
 
